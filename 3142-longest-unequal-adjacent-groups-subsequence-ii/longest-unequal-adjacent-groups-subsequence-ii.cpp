@@ -1,41 +1,65 @@
 class Solution {
-public:
-    bool hammingCheck(string s1,string s2){
-        if(s1.size()!=s2.size())return false;
-        int n=s1.size();
-        int diff=0;
-        for(int i=0;i<n;i++){
-            diff+=s1[i]!=s2[i];
-            if(diff>1)return false;
+private:
+    bool checkhammingDistanceOne(string &s1, string &s2) {
+        if(s1.length() != s2.length()){
+            return false;
         }
-        return true;
+        int diff = 0;
+        for(int i = 0; i < s1.length(); i++) {
+            if(s1[i] != s2[i]) {
+                diff++;
+            }
+            if(diff > 1) {
+                return false;
+            }
+        }
+        return diff == 1;
     }
+
+    int LIS(int curr, int prev, vector<string>& words, vector<int>& groups, vector<vector<int>>& dp) {
+        if (curr == words.size()) {
+            return 0;
+        }
+        if (dp[curr][prev + 1] != -1) {
+            return dp[curr][prev + 1];
+        }
+
+        int notTake = LIS(curr + 1, prev, words, groups, dp);
+
+        int take = 0;
+        if (prev == -1 || (groups[curr] != groups[prev] && checkhammingDistanceOne(words[prev], words[curr]))) {
+            take = 1 + LIS(curr + 1, curr, words, groups, dp);
+        }
+
+        return dp[curr][prev + 1] = max(take, notTake);
+    }
+
+    void reconstruct(int curr, int prev, vector<string>& words, vector<int>& groups, vector<vector<int>>& dp, vector<string>& result) {
+        if (curr == words.size()) {
+            return;
+        }
+
+        int notTake = LIS(curr + 1, prev, words, groups, dp);
+
+        if (prev == -1 || (groups[curr] != groups[prev] && checkhammingDistanceOne(words[prev], words[curr]))) {
+            int take = 1 + LIS(curr + 1, curr, words, groups, dp);
+            if (take >= notTake) {
+                result.push_back(words[curr]);
+                reconstruct(curr + 1, curr, words, groups, dp, result);
+                return;
+            }
+        }
+
+        reconstruct(curr + 1, prev, words, groups, dp, result);
+    }
+public:
     vector<string> getWordsInLongestSubsequence(vector<string>& words, vector<int>& groups) {
-        int n=words.size();
-        vector<int> dp(n,1);
-        vector<int> prev(n);
-        for(int i=0;i<n;i++){
-            prev[i]=i;
-        }
-        int maxIdx=0;
-        for(int i=0;i<n;i++){
-            for(int j=0;j<i;j++){
-                if((hammingCheck(words[i],words[j]) && groups[i]!=groups[j]) && dp[j]+1>dp[i]){
-                    dp[i]=dp[j]+1;
-                    prev[i]=j;
-                }
-            }
-            if(dp[i]>dp[maxIdx]){
-                maxIdx=i;
-            }
-        }
-        vector<string> ans;
-        while(prev[maxIdx]!=maxIdx){
-            ans.push_back(words[maxIdx]);
-            maxIdx = prev[maxIdx];
-        }
-        ans.push_back(words[maxIdx]);
-        reverse(ans.begin(),ans.end());
-        return ans;
+        int n = words.size();
+        vector<vector<int>> dp(n, vector<int>(n + 1, -1));
+        vector<string> result;
+
+        LIS(0, -1, words, groups, dp);
+        reconstruct(0, -1, words, groups, dp, result);
+        return result;
     }
 };
