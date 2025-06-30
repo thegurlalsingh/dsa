@@ -12,23 +12,13 @@ public:
         vector<int> arr;
         inorderTraversal(root, arr);
 
-        int idx1 = -1, idx2 = -1;
-        for (int i = 0; i < arr.size(); i++) {
-            if (arr[i] == low) idx1 = i;
-            if (arr[i] == high) idx2 = i;
-        }
-
-        if (idx1 == -1 || idx2 == -1) 
-        {
-            return 0;
-        }
-        if (idx1 > idx2) {
-            swap(idx1, idx2);
-        }
-        
         int sum = 0;
-        for (int i = idx1; i <= idx2; i++) {
-            sum += arr[i];
+        int i = 0;
+        while(i < arr.size()){
+            if(arr[i] >= low && arr[i] <= high){
+                sum += arr[i];
+            }
+            i++;
         }
 
         return sum;
