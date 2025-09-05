@@ -18,6 +18,6 @@ private:
         int a=f(matrix,i+1,j-1,dp);
         int b=f(matrix,i+1,j,dp);
         int c=f(matrix,i+1,j+1,dp);
-        return dp[i][j]=min(a,min(b,c))+matrix[i][j];
+        return dp[i][j]=min({a, b, c})+matrix[i][j];
     }
 };
