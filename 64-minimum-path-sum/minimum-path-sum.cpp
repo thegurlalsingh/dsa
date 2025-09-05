@@ -1,32 +1,32 @@
 class Solution 
 {
   public:
-    int minPathSumHelper(vector<vector<int>> &grid,vector<vector<int>> &dp,int m, int n, int i, int j){
+    int minPathSumHelper(vector<vector<int>> &grid, vector<vector<int>> &dp, int m, int n, int i, int j) {
 
-        if(i==m-1 && j==n-1){
+        if (i == m - 1 && j == n - 1) {
             return grid[i][j];
         }
-        if(i>=m || j>=n){
-            return INT_MAX; 
+        if (i >= m || j >= n) {
+            return INT_MAX;  // invalid path
         }
-        if(dp[i][j]!=-1){
+        if (dp[i][j] != -1) {
             return dp[i][j];
         }
-        
-        int x = minPathSumHelper(grid,dp,m,n,i+1,j);
-        int y = minPathSumHelper(grid,dp,m,n,i,j+1);
-        
-        int ans = min(x,y) + grid[i][j];
-        dp[i][j] = ans;
-        return ans;
-    }
-    
-    int minPathSum(vector<vector<int>> &grid) {
 
+        int down = minPathSumHelper(grid, dp, m, n, i+1, j);
+        int right = minPathSumHelper(grid, dp, m, n, i, j+1);
+
+        int resDown = (down == INT_MAX ? INT_MAX : grid[i][j] + down);
+        int resRight = (right == INT_MAX ? INT_MAX : grid[i][j] + right);
+
+        return dp[i][j] = min(resDown, resRight);
+    }
+
+    int minPathSum(vector<vector<int>> &grid) {
         int m = grid.size();
         int n = grid[0].size();
-        vector<vector<int>> dp(m, vector<int>(n,-1));
+        vector<vector<int>> dp(m, vector<int>(n, -1));
 
-       return minPathSumHelper(grid,dp,m,n,0,0);
+        return minPathSumHelper(grid, dp, m, n, 0, 0);
     }
 };
