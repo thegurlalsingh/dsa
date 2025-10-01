@@ -1,40 +1,26 @@
 class Solution {
 public:
     int numberOfSubstrings(string s) {
-        int i = 0;
-        int j = 0;
-        int a = 0;
-        int b = 0;
-        int c = 0;
-        int n = s.size();
-        int count = 0;
-        while(j < n){
-            if(s[j] == 'a'){
-                a++;
-            }
-            else if(s[j] == 'b'){
-                b++;
-            }
-            else{
-                c++;
-            }
-            while((a >= 1) && (b >= 1) && (c >= 1)){
-                int temp = 0;
-                temp = n - j;
-                count += temp;
-                if(s[i] == 'a'){
-                    a--;
-                }
-                else if(s[i] == 'b'){
-                    b--;
-                }
-                else{
-                    c--;
-                }
-                i++;
-            }
-            j++; 
+        int n=s.size(); //length of string
+         //l is left pointer,r is right pointer and total counts total number of substrings
+        int l=0,r=0,cnta=0,cntb=0,cntc=0,total=0;
+        while(r<n){ //update the cnts
+            if(s[r]=='a') cnta++;
+           else if(s[r]=='b') cntb++;
+            else cntc++;
+            //shrink while this window is valid
+             while(cnta>=1 && cntb>=1 && cntc>=1){
+                total+=n-r; //becuase all substrings from n-r are valid
+               //start shrinking from left
+                if(s[l]=='a') cnta--;
+           else if(s[l]=='b') cntb--;
+            else cntc--;
+            l++;
+             }
+//increment the right pointer
+             r++;
         }
-        return count;
+//return total number of substrings
+        return total;
     }
 };
