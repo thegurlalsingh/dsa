@@ -1,19 +1,21 @@
 class Solution {
 public:
     int firstMissingPositive(vector<int>& nums) {
-        nums.erase(remove_if(nums.begin(), nums.end(), [](int n) { return n <= 0; }), nums.end());
-
+        int i = 1;
         sort(nums.begin(), nums.end());
-
-        int target = 1;
-        for (int n : nums) {
-            if (n == target) {
-                target++;
-            } else if (n > target) {
-                return target;
+        for(int k = 0; k < nums.size(); k++){
+            if(nums[k] <= 0 || (k != 0 && nums[k] == nums[k - 1])){
+                continue;
+            }
+            else{
+                if(nums[k] == i){
+                    i++;
+                }
+                else{
+                    return i;
+                }
             }
         }
-        
-        return target;        
+        return i;
     }
 };
