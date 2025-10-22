@@ -1,24 +1,21 @@
 class Solution {
-private:
-    void generateParentheses(int open, int close, string current, vector<string>& result) {
-        if (open == 0 && close == 0) {
-            result.push_back(current);
-            return;
+    void solve(int open, int close, string current, vector<string>& res, int n){
+        if(current.size() == n * 2){
+            res.push_back(current);
+            return ;
         }
-
-        if (open > 0) {
-            generateParentheses(open - 1, close, current + "(", result);
+        if(open < n){
+            solve(open + 1, close, current + '(', res, n);
         }
-
-        if (close > open) {
-            generateParentheses(open, close - 1, current + ")", result);
+        if(close < open){
+            solve(open, close + 1, current + ')', res, n);
         }
     }
-
 public:
     vector<string> generateParenthesis(int n) {
-        vector<string> result;
-        generateParentheses(n, n, "", result);
-        return result;
+        string current = "";
+        vector<string> res;
+        solve(0, 0, current, res, n);
+        return res;
     }
 };
