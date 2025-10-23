@@ -1,26 +1,32 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
 class Solution {
-private:
-    void inorderTraversal(TreeNode* root, vector<int>& arr) {
-        if (!root) return;
-        inorderTraversal(root->left, arr);
-        arr.push_back(root->val);
-        inorderTraversal(root->right, arr);
+    void solve(TreeNode* root, int low, int high, int &sum){
+        if(!root){
+            return ;
+        }
+        // if(!root->left && !root->right){
+        //     return ;
+        // }
+        if(root->val <= high && root->val >= low){
+            sum += root->val;
+        }
+        solve(root->right, low, high, sum);
+        solve(root->left, low, high, sum);
     }
-
 public:
     int rangeSumBST(TreeNode* root, int low, int high) {
-        vector<int> arr;
-        inorderTraversal(root, arr);
-
         int sum = 0;
-        int i = 0;
-        while(i < arr.size()){
-            if(arr[i] >= low && arr[i] <= high){
-                sum += arr[i];
-            }
-            i++;
-        }
-
+        solve(root, low, high, sum);
         return sum;
     }
 };
