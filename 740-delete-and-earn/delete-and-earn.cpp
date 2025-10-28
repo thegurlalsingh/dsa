@@ -5,8 +5,12 @@ class Solution {
 
         int notpick = 0 + dfs(i + 1, n, nums, m, dp);
         int pick = m[nums[i]] * nums[i];
-        if(i + 1 < n && nums[i] + 1 == nums[i + 1]) pick += dfs(i + 2, n, nums, m, dp);
-        else if(i + 1 < n && nums[i] + 1 != nums[i + 1]) pick += dfs(i + 1, n, nums, m, dp);
+
+        int nextIdx = i + 1;
+        while(nextIdx < n && nums[nextIdx] == nums[i] + 1)
+            nextIdx++;
+
+        pick += dfs(nextIdx, n, nums, m, dp);
         
         return dp[i] = max(pick, notpick);
     }
