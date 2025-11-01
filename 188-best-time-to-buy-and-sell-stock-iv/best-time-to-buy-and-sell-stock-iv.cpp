@@ -1,28 +1,29 @@
+#include <vector>
+#include <algorithm>
+using namespace std;
+
 class Solution {
-private:
-    int maxProfitHelper(vector<int>& prices, int index, int capping, int holding, vector<vector<vector<int>>>& dp) {
-        if (index == prices.size() || capping == 0) {
-            return 0; 
-        }
-        if (dp[index][capping][holding] != -1) {
-            return dp[index][capping][holding];
-        }
-        int doNothing = maxProfitHelper(prices, index + 1, capping, holding, dp);
-        if (holding) {
-            int sell = prices[index] + maxProfitHelper(prices, index + 1, capping - 1, 0, dp);
-            dp[index][capping][holding] = max(doNothing, sell);
+    int solve(int i, vector<int>& prices, bool bought, int cap, vector<vector<vector<int>>>& dp) {
+        if (i == prices.size() || cap == 0) return 0;
+
+        if (dp[i][bought][cap] != -1) return dp[i][bought][cap];
+
+        int skip = solve(i + 1, prices, bought, cap, dp);
+        int buy = 0, sell = 0;
+
+        if (!bought) {
+            buy = -prices[i] + solve(i + 1, prices, true, cap, dp);
         } else {
-            int buy = -prices[index] + maxProfitHelper(prices, index + 1, capping, 1, dp);
-            dp[index][capping][holding] = max(doNothing, buy);
+            sell = prices[i] + solve(i + 1, prices, false, cap - 1, dp);
         }
-        return dp[index][capping][holding];
+
+        return dp[i][bought][cap] = max({skip, buy, sell});
     }
 
 public:
     int maxProfit(int k, vector<int>& prices) {
         int n = prices.size();
-        if (n == 0 || k == 0) return 0;
-        vector<vector<vector<int>>> dp(n, vector<vector<int>>(k + 1, vector<int>(2, -1))); 
-        return maxProfitHelper(prices, 0, k, 0, dp);
+        vector<vector<vector<int>>> dp(n, vector<vector<int>>(2, vector<int>(k + 1, -1)));
+        return solve(0, prices, false, k, dp);
     }
 };
