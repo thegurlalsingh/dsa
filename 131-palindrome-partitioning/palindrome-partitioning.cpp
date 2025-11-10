@@ -1,36 +1,35 @@
 class Solution {
-    bool isPalindrome(int x, int y, string s){
-        while(x < y){
-            if(s[x] != s[y]){
+    bool isPalindrome(string& s){
+        int i = 0, j = s.length() - 1;
+        while(i < j){
+            if(s[i] != s[j]){
                 return false;
             }
-            x++;
-            y--;
+            i++;
+            j--;
         }
         return true;
     }
 
-
-    void solve(vector<string>& current, vector<vector<string>>& res, string& s, int i, string t){
-        if(i == s.size()){
-            res.push_back(current);
-            return;
+    void solve(int i, string &s, vector<string>& current, vector<vector<string>>& result){
+        if(i >= s.length()){
+            result.push_back(current);
+            return ;
         }
-        for(int start = i; start < s.length(); start++){
-            t = s.substr(i, start - i + 1);
-            if(isPalindrome(0, t.size() - 1, t)){
-                current.push_back(t);
-                solve(current, res, s, start + 1, t);
+        for(int j = i; j < s.length(); j++){
+            string sub = s.substr(i, j - i + 1);
+            if(isPalindrome(sub)){
+                current.push_back(sub);
+                solve(j + 1, s, current, result);
                 current.pop_back();
             }
-            
         }
     }
 public:
     vector<vector<string>> partition(string s) {
-        vector<vector<string>> res;
+        vector<vector<string>> result;
         vector<string> current;
-        solve(current, res, s, 0, "");
-        return res;
+        solve(0, s, current, result);
+        return result;
     }
 };
