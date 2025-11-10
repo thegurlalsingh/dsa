@@ -1,5 +1,5 @@
 class Solution {
-    int dp[105][105][105]; // dp[i][members][p]
+    int dp[205][205][205]; // dp[i][members][p]
     const int MOD = 1e9 + 7;
 
     int solve(int n, vector<int>& group, int i, int minProfit, vector<int>& profit, int p, int members) {
