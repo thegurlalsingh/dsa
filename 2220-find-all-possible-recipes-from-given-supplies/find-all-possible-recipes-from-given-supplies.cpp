@@ -1,40 +1,33 @@
 class Solution {
-private:
-    bool canMakeRecipe(vector<string>& ingredients, unordered_map<string, int>& supply) {
-        for (auto& ing : ingredients) {
-            if (supply.find(ing) == supply.end()) {
+    bool solve(unordered_set<string>& supply, vector<string>& ing){
+        for(string& x : ing){
+            if(supply.find(x) == supply.end())
                 return false;
-            }
         }
         return true;
     }
-    
 public:
     vector<string> findAllRecipes(vector<string>& recipes, vector<vector<string>>& ingredients, vector<string>& supplies) {
         vector<string> res;
-        unordered_map<string, int> supply;
-        
-        for (auto& s : supplies) {
-            supply[s] = 1;
-        }
-        
+        unordered_set<string> supply(supplies.begin(), supplies.end());
+
         int n = recipes.size();
-        vector<bool> done(n, false); 
-        bool progress = true;
-        
-        while (progress) {
-            progress = false;
-            
-            for (int i = 0; i < n; i++) {
-                if (!done[i] && canMakeRecipe(ingredients[i], supply)) {
+        vector<bool> made(n, false);
+
+        bool changed = true;
+
+        while(changed){
+            changed = false;
+            for(int i = 0; i < n; i++){
+                if(!made[i] && solve(supply, ingredients[i])){
+                    made[i] = true;
+                    supply.insert(recipes[i]);
                     res.push_back(recipes[i]);
-                    supply[recipes[i]] = 1;  
-                    done[i] = true;
-                    progress = true; 
+                    changed = true;
                 }
             }
         }
-        
+
         return res;
     }
 };
