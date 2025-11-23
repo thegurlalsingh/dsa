@@ -1,57 +1,41 @@
 class Solution {
 public:
-    int K;
-    int dp[20001][4];
-
-    int helper(vector<int> &ans, int i, int limit){
-        if(limit == 0) return 0;
-        if(i >= ans.size()) return INT_MIN;
-
-        if(dp[i][limit] != -1) return dp[i][limit];
-
-        int include = ans[i] + helper(ans, i + K, limit - 1);
-        int exclude = helper(ans, i + 1, limit);
-
-        return dp[i][limit] = max(include, exclude);
-    }
-
-    void Solve(vector<int>& ans, int i, int limit, vector<int> &result){
-        if(limit == 0 || i >= ans.size()) return;
-
-        int include = ans[i] + helper(ans, i + K, limit - 1);
-        int exclude = helper(ans, i + 1, limit);
-
-        // LEXICOGRAPHICALLY SMALLEST
-        if(include >= exclude){           // <= THIS LINE GIVES LEXICOGRAPHIC SMALLEST
-            result.push_back(i);
-            Solve(ans, i + K, limit - 1, result);
-        } 
-        else {
-            Solve(ans, i + 1, limit, result);
+    vector<int>pre;
+    vector<vector<vector<int>>>dp;
+    vector<int> f(vector<int>&nums,int k,int i,int count){
+        if(count==0) return {};
+        if((i+k-1)>=nums.size()){
+            return {};
         }
+        if(dp[i][count].size()!=0) return dp[i][count];
+        vector<int>nt= f(nums,k,i+1,count);
+        vector<int>t;
+        t.push_back(i);
+        vector<int>t1 = f(nums,k,i+k,count-1);
+        t.insert(t.end(),t1.begin(),t1.end());
+        int nsum = 0;
+        int sum = 0;
+        for(int j=0;j<nt.size();j++){
+            int y = nt[j]+k;
+            int x = nt[j];
+            nsum += (pre[y]-pre[x]);
+        }
+        for(int j=0;j<t.size();j++){
+            int y = t[j]+k;
+            int x = t[j];
+            sum += (pre[y]-pre[x]);
+        }
+        if(nsum>sum) return dp[i][count] = nt;
+        else return dp[i][count] = t;
     }
-
     vector<int> maxSumOfThreeSubarrays(vector<int>& nums, int k) {
         int n = nums.size();
-        K = k;
-
-        vector<int> ans;
-        int sum = 0;
-
-        // Build subarray sums
-        for(int i = 0, j = 0; j < n; j++){
-            sum += nums[j];
-            if(j - i + 1 == k){
-                ans.push_back(sum);
-                sum -= nums[i++];
-            }
+        pre.resize(n+1);
+        dp.resize(20005,vector<vector<int>>(4));
+        pre[0] = 0;
+        for(int i=0;i<n;i++){
+            pre[i+1] = nums[i] + pre[i];
         }
-
-        memset(dp, -1, sizeof(dp));
-
-        vector<int> result;
-        Solve(ans, 0, 3, result);
-
-        return result;
+        return f(nums,k,0,3);
     }
 };
