@@ -1,43 +1,51 @@
 class Solution {
-private:
-    int mismatches(int start, int end, string &s) {
-        int mismatches = 0;
-        while (start < end) {
-            if (s[start] != s[end]) {
-                mismatches++;
-            }
-            start++;
-            end--;
-        }
-        return mismatches;
-    }
-
-    int solve(string& s, int k, int i, vector<vector<int>> &dp, int n){
-        if(i >= s.length() && k == 0){
-            return 0;
-        }
-        if(k == 0 || i >= s.length()){
-            return INT_MAX;
-        }
-        if (dp[i][k] != -1) {
-            return dp[i][k]; 
-        }
-        int changes = INT_MAX;
-        for (int j = i; j < n; j++) {
-            int cost = mismatches(i, j, s);
-            int next = solve(s, k - 1, j + 1, dp, n);
-            if(next != INT_MAX){
-                changes = min(changes, cost + next);
-            }
-        }
-        return dp[i][k] = changes; 
-
-    }
 public:
+    vector<vector<int>> cost;               // cost to make s[l..r] palindrome
+    int n;
+    string s;
+    int dp[101][101];                       // dp[idx][k]
+
+    // Cost to convert s[l..r] into palindrome
+    int getCost(int l, int r) {
+        int cnt = 0;
+        while (l < r) {
+            if (s[l] != s[r]) cnt++;
+            l++; r--;
+        }
+        return cnt;
+    }
+
+    // Recursively split s[idx..n-1] into k palindromes
+    int solve(int idx, int k) {
+        if (idx == n && k == 0) return 0;
+        if (idx == n || k == 0) return 1e9;   // invalid
+        if (dp[idx][k] != -1) return dp[idx][k];
+
+        int ans = 1e9;
+
+        // Try ending the first palindrome at every position i
+        for (int i = idx; i < n; i++) {
+            int partCost = cost[idx][i];               // make s[idx..i] palindrome
+            ans = min(ans, partCost + solve(i + 1, k - 1));
+        }
+
+        return dp[idx][k] = ans;
+    }
+
     int palindromePartition(string s, int k) {
-        int n = s.size();
-        vector<vector<int>> dp(n, vector<int>(k + 1, -1)); 
-        int result = solve(s, k, 0, dp, n);
-        return result == INT_MAX ? 0 : result;
+        this->s = s;
+        n = s.size();
+
+        memset(dp, -1, sizeof(dp));
+        cost.assign(n, vector<int>(n, 0));
+
+        // Precompute cost for every substring
+        for (int i = 0; i < n; i++) {
+            for (int j = i; j < n; j++) {
+                cost[i][j] = getCost(i, j);
+            }
+        }
+
+        return solve(0, k);
     }
 };
