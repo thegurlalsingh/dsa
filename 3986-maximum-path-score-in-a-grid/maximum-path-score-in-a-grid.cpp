@@ -24,11 +24,9 @@ class Solution {
         int right = solve(i + 1, j, m, n, grid, k - cost);
         int down  = solve(i, j + 1, m, n, grid, k - cost);
 
-        int best = INT_MIN;
-        if (right != INT_MIN) best = max(best, score + right);
-        if (down  != INT_MIN) best = max(best, score + down);
+        int a = max({right, down});
 
-        return dp[i][j][k] = best;
+        return dp[i][j][k] = a + score;
     }
 
 public:
