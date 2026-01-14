@@ -1,32 +1,35 @@
-class Solution {
+class Solution
+{
 public:
-    string _max(string a , string b){
-        if(a.length() != b.length()){
-            return (a.length() < b.length()) ? b : a;
-        }else{
-            return max(a,b);
+    string solve(int tgt, vector<int> &c, vector<string> &dp)
+    {
+        if (tgt == 0)
+        {
+            return "";
         }
-    }
-    string largestNumber(vector<int>& cost, int target) {
-        vector<vector<string>> dp(10 , vector<string>(target+1 , ""));
-        //base case
-        for(int t=1;t<=target;t++)dp[0][t] = "0";
-        //dp
-        for(int i=0;i<=8;i++){
-            for(int t=1;t<=target;t++){
-                if(t >= cost[i]){
-                    string take = dp[i+1][t-cost[i]];
-                    if(take != "0")take = to_string(i+1) + take;
-                    string not_take = dp[i][t];
-
-                    dp[i+1][t] = _max(take , not_take);
-                }else{
-                    dp[i+1][t] = dp[i][t];
+        if (dp[tgt] != "#")
+        {
+            return dp[tgt];
+        }
+        string ans = "0";
+        for (int i = 1; i <= 9; i++)
+        {
+            if (tgt >= c[i-1])
+            {
+                string curr = solve(tgt - c[i - 1], c, dp);
+                if(curr=="0")continue;
+                curr = to_string(i)+curr;
+                if(ans.length()>curr.length())continue;
+                if((ans=="0")||(curr.length()>ans.length())||(curr.length()==ans.length()&&curr.compare(ans)>0)){
+                    ans =curr;
                 }
             }
         }
-
-        string ans = dp[9][target];
-        return (ans.empty()) ? "0" : ans;
+        return dp[tgt] = ans;
+    }
+    string largestNumber(vector<int> &cost, int target)
+    {
+        vector<string> dp(target + 1, "#");
+        return solve(target, cost, dp);
     }
 };
