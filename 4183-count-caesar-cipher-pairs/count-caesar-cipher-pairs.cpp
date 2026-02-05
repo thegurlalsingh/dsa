@@ -1,44 +1,44 @@
-struct VectorHash {
-    size_t operator()(const vector<int>& v) const {
-        size_t hash = 0;
-        for (int x : v) {
-            hash = hash * 31 + x; 
-        }
-        return hash;
-    }
-};
-
 class Solution {
-    vector<int> ascii(string& s){ 
-        vector<int> diff; 
-        if(s.size() == 1){ 
-            diff.push_back((int)s[0]); 
-            return diff; 
-            } 
-            for(int i = 1; i < s.size(); i++){ 
-                int d = s[i] - s[i - 1]; 
-                if(d < 0){ 
-                    d += 26; 
-                } 
-                diff.push_back(d); 
-            } 
-            return diff; 
+    long long f(long long x){
+        return (x * (x - 1)) / 2;
+    }
+
+    long long hashVector(const vector<int>& v) {
+        const long long P = 31;
+        const long long M = 1000000007;
+
+        long long h = 0;
+        long long power = 1;
+
+        for (int x : v) {
+            h = (h + x * power) % M;
+            power = (power * P) % M;
         }
+        return h;
+    }
+
 public:
     long long countPairs(vector<string>& words) {
-        if(words[0].size() == 1){
-            long long n = words.size();
-            return n * (n - 1) / 2;  
+        unordered_map<long long, long long> mp;
+
+        for (int i = 0; i < words.size(); i++) {
+            vector<int> temp;
+
+            for (int j = 1; j < words[i].size(); j++) {
+                int x = (words[i][j] - words[i][j - 1] + 26) % 26;
+                temp.push_back(x);
+            }
+
+            long long hash = hashVector(temp);
+            mp[hash]++;
         }
-        unordered_map<vector<int>, long long, VectorHash> freq;
+
         long long count = 0;
-
-        for(int i = 0; i < words.size(); i++){
-            vector<int> temp = ascii(words[i]);
-            count += freq[temp];  
-            freq[temp]++;
+        for (auto& p : mp) {
+            if (p.second > 1) {
+                count += f(p.second);
+            }
         }
-
         return count;
     }
 };
