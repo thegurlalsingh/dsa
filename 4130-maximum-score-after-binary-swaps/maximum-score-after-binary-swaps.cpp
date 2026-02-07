@@ -1,25 +1,19 @@
 class Solution {
 public:
     long long maximumScore(vector<int>& nums, string s) {
-        long long count = 0; priority_queue<pair<int, int>> pq;
-        for(int i = 0; i < s.size(); i++){
-            if(s[i] == '0'){
-                pq.push({nums[i], i});
-            }
-            else{
-                if(!pq.empty() && nums[i] < pq.top().first && pq.top().second < i){
-                    swap(s[i], s[pq.top().second]);
-                    pq.pop();
-                    pq.push({nums[i], i});
-                }
-            }
-        }
-        for(int i = 0; i < s.size(); i++){
-            if(s[i] == '1'){
-                count += (long long)nums[i];
-            }
-        }
+        long long n = nums.size();
 
-        return count;
+        //algorithm
+        priority_queue<long long> pq;
+        long long i = 0, ans = 0;
+        while(i < n){
+            pq.push(nums[i]);
+            if(s[i] == '1'){
+                ans += pq.top();
+                pq.pop();
+            }
+            i++;
+        }
+        return ans;
     }
 };
