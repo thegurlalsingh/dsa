@@ -1,29 +1,23 @@
 class Solution {
 public:
-    vector<int> lexSmallestNegatedPerm(int &n, long long &target) {
-        long long S = 1LL * n * (n + 1) / 2;
+    vector<int> lexSmallestNegatedPerm(int n, long long target) {
+        long long sum = 1LL * n * (n + 1) / 2;
+        long long neg_sum = sum - target;
+        if(neg_sum < 0 || neg_sum % 2 != 0 || abs(sum) < abs(target)) return {};
+        neg_sum /= 2;
 
-        if (abs(target) > S || (S - target) % 2 != 0)
-            return {};
+        vector<int> perm(n);
+        for(int i = 0; i < n; i++) perm[i] = i + 1;
 
-        long long need = (S - target) / 2;
-        vector<bool> neg(n + 1, false);
-
-        for (int i = n; i >= 1; i--) {
-            if (i <= need) {
-                neg[i] = true;
-                need -= i;
+        // pick numbers to negate greedily from largest to smallest
+        for(int i = n; i >= 1; i--){
+            if(i <= neg_sum){
+                perm[i-1] = -perm[i-1];
+                neg_sum -= i;
             }
         }
-
-        if (need != 0) return {};
-
-        vector<int> ans;
-        for (int i = 1; i <= n; i++) {
-            if (neg[i]) ans.push_back(-i);
-            else ans.push_back(i);
-        }
-        sort(ans.begin(), ans.end());
-        return ans;
+        sort(perm.begin(), perm.end());
+        // perm is already in lexicographically smallest order
+        return perm;
     }
 };
