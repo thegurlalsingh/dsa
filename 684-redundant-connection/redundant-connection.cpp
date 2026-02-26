@@ -19,43 +19,41 @@ public:
         int ulp_u = findUPar(u);
         int ulp_v = findUPar(v);
         if (ulp_u == ulp_v) return;
-        if (rank[ulp_u] < rank[ulp_v]) parent[ulp_u] = ulp_v;
-        else if (rank[ulp_v] < rank[ulp_u]) parent[ulp_v] = ulp_u;
-        else parent[ulp_v] = ulp_u, rank[ulp_u]++;
+        if (rank[ulp_u] < rank[ulp_v]) {
+            parent[ulp_u] = ulp_v;
+        }
+        else if (rank[ulp_v] < rank[ulp_u]) {
+            parent[ulp_v] = ulp_u;
+        }
+        else {
+            parent[ulp_v] = ulp_u;
+            rank[ulp_u]++;
+        }
     }
 };
 
-class Solution {
-    int n;
-
-    bool reachable(int removed, vector<vector<int>>& edges) {
-        // create a fresh DSU every call (your missing part)
-        DisjointSet ds(n);
-
-        // union all edges except the removed one
-        for (int k = 0; k < edges.size(); k++) {
-            if (k != removed) {
-                ds.unionByRank(edges[k][0], edges[k][1]);
-            }
-        }
-
-        // check if removing this edge still keeps its endpoints connected
-        int u = edges[removed][0];
-        int v = edges[removed][1];
-
-        return ds.findUPar(u) == ds.findUPar(v);
+bool f(vector<int>& edge, DisjointSet& ds){
+    int u = ds.findUPar(edge[0]);
+    int v = ds.findUPar(edge[1]);
+    if(u == v){
+        return false;
     }
-
+    return true;
+}
+class Solution {
 public:
     vector<int> findRedundantConnection(vector<vector<int>>& edges) {
-        n = edges.size();
-
-        // try removing each edge from last to first
-        for (int i = n - 1; i >= 0; i--) {
-            if (reachable(i, edges)) {
-                return {edges[i][0], edges[i][1]};
+        int n = edges.size();
+        DisjointSet ds(n);
+        vector<int> ans;
+        for(int i = 0; i < edges.size(); i++){
+            if(f(edges[i], ds)){
+                ds.unionByRank(edges[i][0], edges[i][1]);
             }
-        }
-        return {};
+            else{
+                ans = edges[i];
+            }
+        }      
+        return ans;
     }
 };
