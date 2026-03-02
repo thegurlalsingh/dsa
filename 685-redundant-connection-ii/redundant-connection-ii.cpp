@@ -1,63 +1,75 @@
-class DisjointSet {
-    vector<int> parent, rank;
-public:
-    DisjointSet(int n) {
-        parent.resize(n + 1);
-        rank.resize(n + 1, 0);
-        for (int i = 0; i <= n; i++) parent[i] = i;
-    }
-
-    int findUPar(int x) {
-        if (parent[x] == x) return x;
-        return parent[x] = findUPar(parent[x]);
-    }
-
-    bool unite(int u, int v) {
-        int pu = findUPar(u), pv = findUPar(v);
-        if (pu == pv) return false; // cycle detected
-        if (rank[pu] < rank[pv]) parent[pu] = pv;
-        else if (rank[pv] < rank[pu]) parent[pv] = pu;
-        else parent[pv] = pu, rank[pu]++;
-        return true;
-    }
-};
-
 class Solution {
+private:
+    int findParent(int u, vector<int> &p){
+        if(u==p[u])return u;
+        return p[u]=findParent(p[u],p);
+    }
+    void Union(int a,int b, vector<int> &s, vector<int> &p){
+        int u=findParent(a,p);
+        int v=findParent(b,p);
+        if(s[u]>s[v]){
+            p[v]=u;
+            s[u]+=s[v];
+        }else{
+            p[u]=v;
+            s[v]+=s[u];
+        }
+    }
 public:
     vector<int> findRedundantDirectedConnection(vector<vector<int>>& edges) {
-        int n = edges.size();
-        vector<int> parent(n + 1, 0);
-        
-        vector<int> first, second; // two edges giving same child
-        
-        // Step 1: detect if any node has two parents
-        for (auto &e : edges) {
-            int u = e[0], v = e[1];
-            if (parent[v] == 0) {
-                parent[v] = u;
-            } else {
-                // v already has a parent → two-parent case
-                first = {parent[v], v}; // earlier edge
-                second = {u, v};        // later edge
-                e[1] = 0;               // invalidate second edge temporarily
-            }
-        }
+        int n=edges.size()+1;
 
-        DisjointSet ds(n);
-        for (auto &e : edges) {
-            int u = e[0], v = e[1];
-            if (v == 0) continue; 
-            if (!ds.unite(u, v)) { // cycle detected
-                if (first.empty()) {
-                    // No two-parent case, return this edge forming cycle
-                    return e;
+        vector<int> indegree(n,0);
+        vector<vector<int>> adj(n);
+
+        vector<int> p(n);
+        for(int i=0;i<n;i++){
+            p[i]=i;
+        }
+        vector<int> s(n,1);
+
+        int condn=-1;
+        for(auto i:edges){
+            indegree[i[1]]++;
+            if(indegree[i[1]]>1)condn=i[1];
+            adj[i[1]].push_back(i[0]);
+        }
+        vector<int> ans;
+        if(condn==-1){
+            for(auto i:edges){
+                int u=i[0];
+                int v=i[1];
+                int pu=findParent(u,p);
+                int pv=findParent(v,p);
+                if(pu!=pv){
+                    Union(pu,pv,s,p);
+                }else{
+                    ans={u,v};
+                    break;
                 }
-                // There was a two-parent case → return the first one
-                return first;
+            }
+        }else{
+            for(auto j:edges){
+                if(j[1]==condn)continue;
+                int u=j[0];
+                int v=j[1];
+                int pu=findParent(u,p);
+                int pv=findParent(v,p);
+                Union(pu,pv,s,p);
+            }
+            for(auto i:adj[condn]){
+                int u=i;
+                int v=condn;
+                int pu=findParent(u,p);
+                int pv=findParent(v,p);
+                if(pu!=pv){
+                    Union(pu,pv,s,p);
+                }else{
+                    ans={u,v};
+                    break;
+                }
             }
         }
-
-        // If we reach here: no cycle → remove the second edge
-        return second;
+        return ans;
     }
 };
