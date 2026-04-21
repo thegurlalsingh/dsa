@@ -1,53 +1,37 @@
 class Solution {
 public:
-    int maxSum(vector<int>& nums, int K, int m) {
-        int n = nums.size();
+    vector<int> ps;
+    int n;
+    int dp[2001][2001][2];
+    int f(int idx, int flag, int& m, int k, vector<int>& nums) {
+        if (k < 0) return -1e9;
+        if (idx >= n) return k == 0 ? 0 : -1e9;
 
-        vector<long long> pref(n);
-        pref[0] = nums[0];
-        for (int i = 1; i < n; i++) {
-            pref[i] = pref[i - 1] + nums[i];
+        int ans = -1e9;
+        if(dp[idx][k][flag]!=-1) return dp[idx][k][flag];
+        if (flag) {
+            ans = max(ans, nums[idx] + f(idx + 1, 1, m, k, nums));
+            ans = max(ans, f(idx, 0, m, k, nums));
+        } 
+        else {
+            int li = idx + m - 1;
+            if (li < n) {
+                ans = max(ans, ps[li + 1] - ps[idx] + f(li + 1, 1, m, k - 1, nums));
+            }
+            ans = max(ans, f(idx + 1, 0, m, k, nums));
         }
 
-        // dp[i] = dp[i][previous k]
-        vector<long long> dp(n + 1, 0);
+        return dp[idx][k][flag] = ans;
+    }
 
-        // we build answer for k = 1 → K
-        for (int k = 1; k <= K; k++) {
+    int maxSum(vector<int>& nums, int k, int m) {
+        n = nums.size();
+        ps.resize(n + 1, 0);
 
-            vector<long long> newdp(n + 1, INT_MIN);
-
-            // Step 1: build val[]
-            vector<long long> val(n, INT_MIN);
-            for (int end = 0; end < n; end++) {
-                if (dp[end + 1] != INT_MIN) {
-                    val[end] = pref[end] + dp[end + 1];
-                }
-            }
-
-            // Step 2: build best[]
-            vector<long long> best(n);
-            best[n - 1] = val[n - 1];
-            for (int i = n - 2; i >= 0; i--) {
-                best[i] = max(val[i], best[i + 1]);
-            }
-
-            for (int i = n - 1; i >= 0; i--) {
-
-                // skip
-                newdp[i] = newdp[i + 1];
-
-                // take
-                int idx = i + m - 1;
-                if (idx < n && best[idx] != INT_MIN) {
-                    long long take = best[idx] - (i == 0 ? 0 : pref[i - 1]);
-                    newdp[i] = max(newdp[i], take);
-                }
-            }
-
-            dp = newdp; // move to next k
+        for (int i = 0; i < n; i++) {
+            ps[i + 1] = ps[i] + nums[i];
         }
-
-        return dp[0];
+        memset(dp,-1,sizeof(dp));
+        return f(0, 0, m, k, nums);
     }
 };
