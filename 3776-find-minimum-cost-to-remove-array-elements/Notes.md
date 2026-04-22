@@ -1,0 +1,1 @@
+<h2>find-minimum-cost-to-remove-array-elements Notes</h2><hr>[ Time taken: 9d 3hrs 52m 24s ]
