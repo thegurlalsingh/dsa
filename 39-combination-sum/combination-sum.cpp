@@ -1,24 +1,26 @@
 class Solution {
-    void solve(vector<vector<int>>& res, vector<int> curr, vector<int>& candidates, int target, int i, int sum){
-        if(sum == target){
-            res.push_back(curr);
-            return ;
+    void solve(int i, vector<int>& current, vector<vector<int>>& ans, vector<int>& candidates, int target) {
+        if (target == 0) {
+            ans.push_back(current);
+            return;
         }
-        if(i >= candidates.size()){
-            return ;
+
+        if (i >= candidates.size() || target < 0) {
+            return;
         }
-        if(sum + candidates[i] <= target){
-            curr.push_back(candidates[i]);
-            solve(res, curr, candidates, target, i, sum + candidates[i]);
-            curr.pop_back();
+
+        for (int j = i; j < candidates.size(); j++) {
+            current.push_back(candidates[j]);
+            solve(j, current, ans, candidates, target - candidates[j]);
+            current.pop_back(); // stay at same place as we can reuse it, dont use accumulate as it is expensive, add one condition if sum goes below zero thats it
         }
-        solve(res, curr, candidates, target, i + 1, sum);
     }
+
 public:
     vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
-        vector<vector<int>> res;
-        vector<int> curr;
-        solve(res, curr, candidates, target, 0, 0);
-        return res;
+        vector<int> current;
+        vector<vector<int>> ans;
+        solve(0, current, ans, candidates, target);
+        return ans;
     }
 };
