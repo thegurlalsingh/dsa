@@ -2,7 +2,7 @@ class Solution {
     void solve(int i, vector<int> &current, vector<vector<int>>& ans, vector<int>& nums){
         if(!current.empty()){
             ans.push_back(current);
-        }
+        } //dont return early as every state is valid here
 
         for(int j = i; j < nums.size(); j++){
             current.push_back(nums[j]);
