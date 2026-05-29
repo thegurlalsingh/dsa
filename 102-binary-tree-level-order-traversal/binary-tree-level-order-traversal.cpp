@@ -10,24 +10,34 @@
  * };
  */
 class Solution {
-public:
-    vector<vector<int>> levelOrder(TreeNode* root) {
-        vector<vector<int>>ans;
-        if(root==NULL)return ans;
-        queue<TreeNode*>q;
+    void solve(TreeNode* root, vector<vector<int>>& ans){
+        if(root == nullptr){
+            return;
+        }
+
+        queue<TreeNode*> q;
         q.push(root);
         while(!q.empty()){
-            int s=q.size();
-            vector<int>v;
-            for(int i=0;i<s;i++){
-                TreeNode *node=q.front();
+            vector<int> temp;
+            int sz = q.size();
+            while(sz--){
+                TreeNode* t = q.front();
+                if(t->left){
+                    q.push(t->left);
+                }
+                if(t->right){
+                    q.push(t->right);
+                }
+                temp.push_back(t->val); 
                 q.pop();
-                if(node->left!=NULL)q.push(node->left);
-                if(node->right!=NULL)q.push(node->right);
-                v.push_back(node->val);
             }
-            ans.push_back(v);
+            ans.push_back(temp);
         }
+    }
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int>> ans;
+        solve(root, ans);
         return ans;
     }
 };
