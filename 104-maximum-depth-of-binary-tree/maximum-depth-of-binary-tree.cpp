@@ -12,7 +12,7 @@
 class Solution {
     void solve(int curr, TreeNode* root, int& d){
         if(root == nullptr){
-            d = max(d, curr);
+            d = max(d, curr); //when you reach leaf node only then only calculate the max depth else do curr + 1 till then and dont touch maximum depth
             return ;
         }
         
