@@ -1,47 +1,70 @@
 class Solution {
 public:
-    struct Node {
-        int r, c, t;
-    };
-
     int orangesRotting(vector<vector<int>>& grid) {
-        int n = grid.size(), m = grid[0].size();
-        queue<Node> q;
-        int fresh = 0;
+        int n = grid.size();
+        int m = grid[0].size();
 
-        // 1. Add rotten oranges & count fresh
-        for(int i=0;i<n;i++){
-            for(int j=0;j<m;j++){
-                if(grid[i][j] == 2){
-                    q.push({i,j,0});
-                }
-                if(grid[i][j] == 1){
-                    fresh++;
-                }
-            }
-        }
+        // bool freshPresent = false;
+        // for(int i = 0; i < n; i++){
+        //     for(int j = 0; j < m; j++){
+        //         if(grid[i][j] == 1){
+        //             freshPresent = true;
+        //         }
+        //     }
+        // }
+        // if(!freshPresent){
+        //     return 0;
+        // }
 
-        int dRow[4] = {-1,1,0,0};
-        int dCol[4] = {0,0,-1,1};
-        int maxTime = 0, rotten = 0;
-
-        // 2. BFS
-        while(!q.empty()){
-            auto curr = q.front(); q.pop();
-            maxTime = max(maxTime, curr.t);
-
-            for(int k=0;k<4;k++){
-                int nr = curr.r + dRow[k];
-                int nc = curr.c + dCol[k];
-                if(nr>=0 && nr<n && nc>=0 && nc<m && grid[nr][nc] == 1){
-                    grid[nr][nc] = 2;
-                    q.push({nr,nc,curr.t+1});
-                    rotten++;
+        queue<pair<int, int>> q;
+        vector<vector<int>> dist(n, vector<int>(m, -1));
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (grid[i][j] == 2) {
+                    q.push({i, j});
+                    dist[i][j] = 0;
                 }
             }
         }
 
-        // 3. Check if all fresh rotted
-        return rotten == fresh ? maxTime : -1;
+        int minutes = 0;
+
+        vector<int> dr = {-1, 0, 1, 0};
+        vector<int> dc = {0, 1, 0, -1};
+
+        while (!q.empty()) {
+            auto t = q.front();
+            q.pop();
+            for (int k = 0; k < 4; k++) {
+                int nr = t.first + dr[k];
+                int nc = t.second + dc[k];
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m && grid[nr][nc] != 2 && grid[nr][nc] != 0 && dist[nr][nc] == -1) {
+                    dist[nr][nc] = dist[t.first][t.second] + 1;
+                    q.push({nr, nc});
+                }
+            }
+        }
+
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < m; j++){
+                if(dist[i][j] != -1 && dist[i][j] != 0){
+                    minutes = max(minutes, dist[i][j]);
+                }
+            }
+        }
+
+        bool allRotten = true;
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < m; j++){
+                if(grid[i][j] == 1 && dist[i][j] == -1){
+                    allRotten = false;
+                }
+            }
+        }
+
+        if(allRotten){
+            return minutes == INT_MAX ? -1 : minutes;
+        }
+        return -1;
     }
 };
