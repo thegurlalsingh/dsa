@@ -1,39 +1,52 @@
 class Solution {
-    bool dfs(int node, vector<vector<int>>& adj, vector<int>& state) {
-        state[node] = 1;  // visiting
-        
-        for (int nxt : adj[node]) {
-            if (state[nxt] == 0) {
-                if (!dfs(nxt, adj, state)) return false;
-            }
-            else if (state[nxt] == 1) {
-                return false;   // cycle found
+    vector<int> topo(int N, vector<vector<int>>& adj) {
+
+        queue<int> q;
+        vector<int> indegree(N, 0);
+
+        for (int i = 0; i < N; i++) {
+            for (int neigh : adj[i]) {
+                indegree[neigh]++;
             }
         }
-        
-        state[node] = 2;  // finished
-        return true;
+
+        for (int i = 0; i < N; i++) {
+            if (indegree[i] == 0)
+                q.push(i);
+        }
+
+        vector<int> order;
+
+        while (!q.empty()) {
+
+            int node = q.front();
+            q.pop();
+
+            order.push_back(node);
+
+            for (int neigh : adj[node]) {
+
+                indegree[neigh]--;
+
+                if (indegree[neigh] == 0)
+                    q.push(neigh);
+            }
+        }
+
+        return order;
     }
-    
+
 public:
-    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
-        
+    bool canFinish(int numCourses, vector<vector<int>>& p) {
+
         vector<vector<int>> adj(numCourses);
-        
-        // create directed graph: a → b
-        for (auto &p : prerequisites)
-            adj[p[0]].push_back(p[1]);
-        
-        vector<int> state(numCourses, 0); // 0=unvisited,1=visiting,2=done
-        
-        // run dfs on each component
-        for (int i = 0; i < numCourses; i++) {
-            if (state[i] == 0) {
-                if (!dfs(i, adj, state)) 
-                    return false;   // cycle detected
-            }
+
+        for (auto& x : p) {
+            adj[x[1]].push_back(x[0]);
         }
-        
-        return true;  // no cycle
+
+        vector<int> t = topo(numCourses, adj);
+
+        return t.size() == numCourses;
     }
 };
