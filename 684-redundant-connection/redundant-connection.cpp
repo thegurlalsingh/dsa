@@ -1,6 +1,7 @@
 class DisjointSet {
-    vector<int> rank, parent;
+
 public:
+    vector<int> rank, parent;
     DisjointSet(int n) {
         rank.resize(n + 1, 0);
         parent.resize(n + 1);
@@ -18,42 +19,52 @@ public:
     void unionByRank(int u, int v) {
         int ulp_u = findUPar(u);
         int ulp_v = findUPar(v);
-        if (ulp_u == ulp_v) return;
+        if (ulp_u == ulp_v)
+            return;
         if (rank[ulp_u] < rank[ulp_v]) {
             parent[ulp_u] = ulp_v;
-        }
-        else if (rank[ulp_v] < rank[ulp_u]) {
+        } else if (rank[ulp_v] < rank[ulp_u]) {
             parent[ulp_v] = ulp_u;
-        }
-        else {
+        } else {
             parent[ulp_v] = ulp_u;
             rank[ulp_u]++;
         }
     }
 };
 
-bool f(vector<int>& edge, DisjointSet& ds){
-    int u = ds.findUPar(edge[0]);
-    int v = ds.findUPar(edge[1]);
-    if(u == v){
-        return false;
-    }
-    return true;
-}
 class Solution {
 public:
     vector<int> findRedundantConnection(vector<vector<int>>& edges) {
-        int n = edges.size();
-        DisjointSet ds(n);
-        vector<int> ans;
-        for(int i = 0; i < edges.size(); i++){
-            if(f(edges[i], ds)){
-                ds.unionByRank(edges[i][0], edges[i][1]);
+
+        vector<vector<int>> up = edges;
+        for(int j = 0; j < edges.size(); j++){
+                up[j][0] = up[j][0] - 1;
+                up[j][1] = up[j][1] - 1;
             }
-            else{
-                ans = edges[i];
+        
+        for(int i = edges.size() - 1; i >= 0; i--){
+            
+            int comp = 0;
+            DisjointSet ds(up.size());
+            vector<int> temp = up[i];
+            for(int j = 0; j < edges.size(); j++){
+                if(i != j){
+                    ds.unionByRank(up[j][0], up[j][1]);
+                }
             }
-        }      
-        return ans;
+
+            for(int j = 0; j < edges.size(); j++){
+                if(ds.findUPar(j) == j){
+                    comp++;
+                }
+            }
+
+            if(comp == 1){
+                return edges[i]; 
+            }
+
+        }
+
+        return {};
     }
 };
