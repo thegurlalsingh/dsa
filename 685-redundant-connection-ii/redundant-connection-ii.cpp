@@ -1,75 +1,66 @@
+
 class Solution {
-private:
-    int findParent(int u, vector<int> &p){
-        if(u==p[u])return u;
-        return p[u]=findParent(p[u],p);
-    }
-    void Union(int a,int b, vector<int> &s, vector<int> &p){
-        int u=findParent(a,p);
-        int v=findParent(b,p);
-        if(s[u]>s[v]){
-            p[v]=u;
-            s[u]+=s[v];
-        }else{
-            p[u]=v;
-            s[v]+=s[u];
-        }
-    }
 public:
     vector<int> findRedundantDirectedConnection(vector<vector<int>>& edges) {
-        int n=edges.size()+1;
-
-        vector<int> indegree(n,0);
-        vector<vector<int>> adj(n);
-
-        vector<int> p(n);
-        for(int i=0;i<n;i++){
-            p[i]=i;
+        vector<vector<int>> up = edges;
+        for (int j = 0; j < edges.size(); j++) {
+            up[j][0] = up[j][0] - 1;
+            up[j][1] = up[j][1] - 1;
         }
-        vector<int> s(n,1);
 
-        int condn=-1;
-        for(auto i:edges){
-            indegree[i[1]]++;
-            if(indegree[i[1]]>1)condn=i[1];
-            adj[i[1]].push_back(i[0]);
-        }
-        vector<int> ans;
-        if(condn==-1){
-            for(auto i:edges){
-                int u=i[0];
-                int v=i[1];
-                int pu=findParent(u,p);
-                int pv=findParent(v,p);
-                if(pu!=pv){
-                    Union(pu,pv,s,p);
-                }else{
-                    ans={u,v};
+        for (int i = edges.size() - 1; i >= 0; i--) {
+
+            int no_of_visited_nodes = 0;
+
+            vector<vector<int>> adj(edges.size());
+            vector<int> indegree(edges.size(), 0);
+
+            for (int j = 0; j < edges.size(); j++) {
+                if (i != j) {
+                    adj[up[j][0]].push_back(up[j][1]);
+                    indegree[up[j][1]]++;
+                }
+            }
+
+            int root = -1;
+
+            for (int i = 0; i < edges.size(); i++) {
+                if (indegree[i] == 0) {
+                    root = i;
                     break;
                 }
             }
-        }else{
-            for(auto j:edges){
-                if(j[1]==condn)continue;
-                int u=j[0];
-                int v=j[1];
-                int pu=findParent(u,p);
-                int pv=findParent(v,p);
-                Union(pu,pv,s,p);
-            }
-            for(auto i:adj[condn]){
-                int u=i;
-                int v=condn;
-                int pu=findParent(u,p);
-                int pv=findParent(v,p);
-                if(pu!=pv){
-                    Union(pu,pv,s,p);
-                }else{
-                    ans={u,v};
-                    break;
+
+            vector<int> visited(edges.size(), -1);
+
+            queue<int> q;
+            q.push(root);
+
+            while (!q.empty()) {
+                int node = q.front();
+                q.pop();
+                if (visited[node] != -1) {
+                    continue;
+                }
+                visited[node] = 1;
+                for (int neigh : adj[node]) {
+                    if (visited[neigh] == -1) {
+                        q.push(neigh);
+                    }
                 }
             }
+
+            for (int j = 0; j < visited.size(); j++) {
+                if (visited[j] == 1) {
+                    no_of_visited_nodes++;
+                }
+            }
+
+            if (no_of_visited_nodes == edges.size()) {
+                return edges[i];
+            }
         }
-        return ans;
+
+        return {};
     }
 };
