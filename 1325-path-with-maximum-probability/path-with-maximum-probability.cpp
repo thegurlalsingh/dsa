@@ -1,50 +1,46 @@
 class Solution {
-public:
-    double maxProbability(int n, vector<vector<int>>& edges,
-                          vector<double>& succProb,
-                          int start, int end) {
-
-        // adjacency list
-        vector<vector<pair<int,double>>> adj(n);
-
-        for (int i = 0; i < edges.size(); i++) {
-            int u = edges[i][0];
-            int v = edges[i][1];
-            double p = succProb[i];
-            adj[u].push_back({v, p});
-            adj[v].push_back({u, p});
-        }
-
-        // max-heap: (probability so far, node)
+    double dijkstra(int s, int e, vector<vector<pair<int, double>>> &adj, int n) {
         priority_queue<pair<double,int>> pq;
 
         vector<double> dist(n, 0.0);
-        dist[start] = 1.0;
-        pq.push({1.0, start});
 
-        while (!pq.empty()) {
-            auto [prob, u] = pq.top();
+        dist[s] = 1.0;
+        pq.push({1.0, s}); 
+
+        while(!pq.empty()) {
+
+            auto [prob, node] = pq.top();
             pq.pop();
 
-            // If this path is already worse, skip
-            if (prob < dist[u]) continue;
+            if(node == e){
+                return prob;
+            }
 
-            // Early stop when reaching end
-            if (u == end) return prob;
+            if(prob < dist[node])
+                continue;
 
-            for (auto &edge : adj[u]) {
-                int v = edge.first;
-                double w = edge.second;
+            for(auto &it : adj[node]) {
 
-                double newProb = prob * w;
+                int neigh = it.first;
+                double new_prob    = it.second;
 
-                if (newProb > dist[v]) {
-                    dist[v] = newProb;
-                    pq.push({newProb, v});
+                if(dist[node] * new_prob > dist[neigh]) {
+                    dist[neigh] = dist[node] * new_prob;
+                    pq.push({dist[neigh], neigh});
                 }
             }
         }
 
-        return 0.0;  // unreachable
+        return 0.0;
     }
+public:
+    double maxProbability(int n, vector<vector<int>>& edges, vector<double>& succProb, int start_node, int end_node) {
+        vector<vector<pair<int, double>>> adj(n);
+        for(int i = 0; i < edges.size(); i++){
+            adj[edges[i][0]].push_back({edges[i][1], succProb[i]});
+            adj[edges[i][1]].push_back({edges[i][0], succProb[i]});
+        }
+        return dijkstra(start_node, end_node, adj, n);
+    }
+
 };
