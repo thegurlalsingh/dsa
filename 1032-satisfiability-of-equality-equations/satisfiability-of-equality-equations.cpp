@@ -34,20 +34,27 @@ public:
 class Solution {
 public:
     bool equationsPossible(vector<string>& equations) {
-        int n = equations.size();
+        // sort(equations.rbegin(), equations.rend());
+        // int offset = 26;
         DisjointSet ds(26);
-        for(int i = 0; i < n; i++){
+        for(int i = 0; i < equations.size(); i++){
             if(equations[i][1] == '='){
-                ds.unionByRank(equations[i][0] - 'a', equations[i][3] - 'a');
+                int c1 = equations[i][0] - 'a';
+                int c2 = equations[i][3] - 'a';
+                ds.unionByRank(c1, c2);
             }
         }
-        for(int i = 0; i < n; i++){
+
+        for(int i = 0; i < equations.size(); i++){
             if(equations[i][1] == '!'){
-                if(ds.findUPar(equations[i][0] - 'a') == ds.findUPar(equations[i][3] - 'a')){
+                int c1 = equations[i][0] - 'a';
+                int c2 = equations[i][3] - 'a';
+                if(ds.findUPar(c1) == ds.findUPar(c2)){
                     return false;
                 }
             }
         }
+
         return true;
     }
 };
