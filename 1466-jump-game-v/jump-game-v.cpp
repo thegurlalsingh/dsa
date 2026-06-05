@@ -24,11 +24,11 @@ class Solution {
                 break;
 
             if (arr[idx - i] >= arr[idx])
-                break;
+                break; 
 
-            if (idx - i >= 0 && arr[idx] > arr[idx - i]) {
+            if (idx - i >= 0 && arr[idx] > arr[idx - i]) { //insetad of this conditions, write break conditions so that they can block the path not skip the block and let the index move to wrong path
                 ans = max(ans, 1 + solve(idx - i, arr, d, dp));
-            }
+            } 
         }
 
         return dp[idx] = ans;
