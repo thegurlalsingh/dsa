@@ -3,7 +3,7 @@ class Solution {
         if(i >= arr.size() || i < 0){
             return false;
         }
-        
+
         if(arr[i] == 0){
             return true;
         }
@@ -12,7 +12,7 @@ class Solution {
             return false;
         }
 
-        visited[i] = 1;
+        visited[i] = 1; // wherever we see something like reachable, can reach, path exists, move left/right, jump forward/backward, teleport, transform -> always think of graph, bfs/dfs etc instead of dp because these can form cycles which dp cant solve
 
         if(dp[i] != -1){
             return dp[i];
