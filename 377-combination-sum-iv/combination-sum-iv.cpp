@@ -1,27 +1,26 @@
 class Solution {
-private:
-    int solve(int sum, vector<int>& nums, int target, vector<int>& dp) {
-        if (sum == target) {
+    int solve(int rem, vector<int>& nums, vector<int>& dp) {
+        if (rem == 0)
             return 1;
-        }
-        if (sum > target) {
+
+        if (rem < 0)
             return 0;
-        }
-        if (dp[sum] != -1) {
-            return dp[sum];
+
+        if (dp[rem] != -1)
+            return dp[rem];
+
+        long long ans = 0;
+
+        for (int x : nums) {
+            ans += solve(rem - x, nums, dp);
         }
 
-        int totalWays = 0;
-        for (int i = 0; i < nums.size(); ++i) {
-            totalWays += solve(sum + nums[i], nums, target, dp);
-        }
-
-        return dp[sum] = totalWays;
+        return dp[rem] = ans;
     }
 
 public:
     int combinationSum4(vector<int>& nums, int target) {
         vector<int> dp(target + 1, -1);
-        return solve(0, nums, target, dp);
+        return solve(target, nums, dp);
     }
 };
