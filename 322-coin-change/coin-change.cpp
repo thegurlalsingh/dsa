@@ -1,22 +1,30 @@
 class Solution {
-    int solve7(int i, int amount, const vector<int>& coins, vector<vector<int>>& dp) {
-        if (i == 0) {
-            if (amount % coins[0] == 0) return amount / coins[0];
-            else return 1e9;
+    int solve(int amount, vector<int>& coins, vector<int>& dp){
+        if(amount == 0){
+            return 0;
         }
-        if (dp[i][amount] != -1) return dp[i][amount];
+        if(amount < 0){
+            return INT_MAX;
+        }
+        if(dp[amount] != -1){
+            return dp[amount];
+        }
 
-        int notTake = solve7(i - 1, amount, coins, dp);
-        int take = 1e9;
-        if (coins[i] <= amount) take = 1 + solve7(i, amount - coins[i], coins, dp);
+        int t = INT_MAX;
+        for(int i = 0; i < coins.size(); i++){
+            int temp = solve(amount - coins[i], coins, dp);
+            if(temp != INT_MAX){
+                t = min(t, temp + 1);
+            }
+        }
 
-        return dp[i][amount] = min(take, notTake);
+        return dp[amount] = t;
     }
 public:
     int coinChange(vector<int>& coins, int amount) {
-        int n = coins.size();
-        vector<vector<int>> dp(n, vector<int>(amount + 1, -1));
-        int ans = solve7(n - 1, amount, coins, dp);
-        return (ans >= 1e9 ? -1 : ans);
+        // int a = accumulate(coins.begin(), coins.end(), 0);
+        vector<int> dp(amount + 1, -1);
+        int ans = solve(amount, coins, dp);
+        return ans == INT_MAX ? -1 : ans;
     }
 };
