@@ -1,29 +1,30 @@
 class Solution {
-    vector<vector<long long>> dp;
-
-    long long solve(int i, int j, string& s, string& t){
-        if (j == t.length()) return 1;     // reached full t → valid subsequence
-        if (i == s.length()) return 0;     // s finished but t not done
-        
-        if (dp[i][j] != -1) return dp[i][j];
-
-        long long notTake = solve(i + 1, j, s, t);
-        long long take = 0;
-
-        if (s[i] == t[j]) {
-            take = solve(i + 1, j + 1, s, t);
+    int solve(int i, int j, string& s, string& t, vector<vector<int>>& dp){
+        if(j >= t.size()){
+            return 1;
         }
 
-        return dp[i][j] = take + notTake;
-    }
+        if(i >= s.size()){
+            return 0;
+        } // i forgot to define this base case
 
+        if(dp[i][j] != -1){
+            return dp[i][j];
+        }
+        int sk = solve(i + 1, j, s, t, dp); // we dont maximization here, if does not matches skip that char in main str not in pattern
+        int ta = 0;
+        if(s[i] == t[j]){
+            ta = solve(i + 1, j + 1, s, t, dp);
+        }
+
+        return dp[i][j] = sk + ta;
+    }
 public:
     int numDistinct(string s, string t) {
-        int n = s.length();
-        int m = t.length();
-
-        dp.assign(n, vector<long long>(m, -1));
-
-        return solve(0, 0, s, t);
+        // if(s.size() < t.size()){
+        //     swap(s, t);
+        // }
+        vector<vector<int>> dp(s.size(), vector<int>(t.size(), -1));
+        return solve(0, 0, s, t, dp);
     }
 };
