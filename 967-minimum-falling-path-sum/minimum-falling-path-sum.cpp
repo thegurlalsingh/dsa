@@ -1,23 +1,42 @@
 class Solution {
+    int solve(int i, int j, vector<vector<int>>& matrix, vector<vector<int>>& dp) {
+        int m = matrix.size();
+        int n = matrix[0].size();
+
+        if(j < 0 || j >= n){
+            return INT_MAX;
+        }
+
+        if(i == m - 1){
+            return matrix[i][j];
+        }
+
+        if(dp[i][j] != INT_MAX){
+            return dp[i][j];
+        }
+
+        int downLeft = solve(i + 1, j - 1, matrix, dp);
+        int down = solve(i + 1, j, matrix, dp);
+        int downRight = solve(i + 1, j + 1, matrix, dp);
+
+        int best = min({downLeft, down, downRight});
+
+        if(best == INT_MAX){
+            return dp[i][j] = INT_MAX;
+        }
+
+        return dp[i][j] = matrix[i][j] + best;
+    }
+
 public:
     int minFallingPathSum(vector<vector<int>>& matrix) {
-        int n=matrix.size();
-        vector<vector<int>> dp(n,vector<int>(n,INT_MIN));
-        int ans=INT_MAX;
-        for(int i=0;i<n;i++){
-            ans=min(ans,f(matrix,0,i,dp));
+        int m = matrix.size();
+        int n = matrix[0].size();
+        vector<vector<int>> dp(m, vector<int>(n, INT_MAX));
+        int ans = INT_MAX;
+        for(int j = 0; j < n; j++) {
+            ans = min(ans, solve(0, j, matrix, dp));
         }
         return ans;
-    }
-private:
-    int f(vector<vector<int>>& matrix,int i,int j,vector<vector<int>>& dp){
-        if(j<0) return INT_MAX;
-        if(j>=matrix.size()) return INT_MAX;
-        if(i==matrix.size()-1) return matrix[i][j];
-        if(dp[i][j]!=INT_MIN) return dp[i][j];
-        int a=f(matrix,i+1,j-1,dp);
-        int b=f(matrix,i+1,j,dp);
-        int c=f(matrix,i+1,j+1,dp);
-        return dp[i][j]=min({a, b, c})+matrix[i][j];
     }
 };
