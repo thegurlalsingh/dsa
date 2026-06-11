@@ -1,27 +1,41 @@
 class Solution {
-public:
-    int shortest_path(int r, int c, vector<vector<int>>& grid, vector<vector<int>>& dp) {
-        int n = grid.size();
-        if (r < 0 || r >= n || c < 0 || c >= n) return 1e9; // Out of bounds
-        if (dp[r][c] != INT_MIN) return dp[r][c]; // Memoized result
-        if (r == n - 1) return dp[r][c] = grid[r][c]; // Base case
+    int solve(int i, int j, vector<vector<int>>& matrix, vector<vector<int>>& dp) {
+        int m = matrix.size();
+        int n = matrix[0].size();
 
-        int nc = INT_MAX;
-        for (int i = 0; i < n; i++) {
-            if (i == c) continue; // Skip same column
-            nc = min(nc, shortest_path(r + 1, i, grid, dp));
+        if(j < 0 || j >= n){
+            return INT_MAX;
+        } // i forgot this and redudantly mention ith index which will never be edge case
+
+        if(i == m - 1){
+            return matrix[i][j]; // redundant arguments like prevj or previ because when you reached last index just directly return that
+        }
+        
+        if(dp[i][j] != INT_MAX){
+            return dp[i][j];
         }
 
-        dp[r][c] = grid[r][c] + nc;
-        return dp[r][c];
+        int ans = INT_MAX;
+        for(int k = 0; k < n; k++){
+            if(k != j){
+                ans = min(ans, matrix[i][j] + solve(i + 1, k, matrix, dp));
+            }
+        }
+
+        if(ans == INT_MAX){
+            return dp[i][j] = INT_MAX;
+        }
+
+        return dp[i][j] = ans;
     }
-
-    int minFallingPathSum(vector<vector<int>>& matrix) {
-        int n = matrix.size(), ans = INT_MAX;
-        vector<vector<int>> dp(n, vector<int>(n, INT_MIN));
-
-        for (int i = 0; i < n; i++) {
-            ans = min(ans, shortest_path(0, i, matrix, dp));
+public:
+    int minFallingPathSum(vector<vector<int>>& grid) {
+        int m = grid.size();
+        int n = grid[0].size();
+        vector<vector<int>> dp(m, vector<int>(n, INT_MAX));
+        int ans = INT_MAX;
+        for(int j = 0; j < n; j++) {
+            ans = min(ans, solve(0, j, grid, dp));
         }
         return ans;
     }
