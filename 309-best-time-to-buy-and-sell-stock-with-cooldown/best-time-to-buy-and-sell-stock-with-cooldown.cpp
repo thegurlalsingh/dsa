@@ -1,25 +1,26 @@
 class Solution {
-private:
-    int maxProfitHelper(vector<int>& prices, int index, int holding, vector<vector<int>>& dp) {
-        if (index >= prices.size()) {
-            return 0; 
-        }
-        if (dp[index][holding] != -1) {
-            return dp[index][holding];
-        }
-        int doNothing = maxProfitHelper(prices, index + 1, holding, dp);
-        if (holding) {
-            int sell = prices[index] + maxProfitHelper(prices, index + 2, 0, dp);
-            return dp[index][holding] = max(doNothing, sell);
+    int solve(int i, vector<int>& prices, bool bought, vector<vector<int>>& dp){
+        if(i >= prices.size()) return 0;
+
+        if(dp[i][bought] != -1) return dp[i][bought];
+
+        int skip = solve(i + 1, prices, bought, dp);
+
+        int action = 0;
+        if(!bought){
+            // Buy today
+            action = solve(i + 1, prices, true, dp) - prices[i];
         } else {
-            int buy = -prices[index] + maxProfitHelper(prices, index + 1, 1, dp);
-            return dp[index][holding] = max(doNothing, buy);
+            // Sell today → profit and continue recursion
+            action = prices[i] + solve(i + 2, prices, false, dp);
         }
+
+        return dp[i][bought] = max(skip, action);
     }
 public:
     int maxProfit(vector<int>& prices) {
         int n = prices.size();
         vector<vector<int>> dp(n, vector<int>(2, -1));
-        return maxProfitHelper(prices, 0, 0, dp);
+        return solve(0, prices, false, dp);
     }
 };
