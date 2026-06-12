@@ -1,25 +1,26 @@
 class Solution {
-private:
-    int maxProfitHelper(vector<int>& prices, int index, int fee, int holding, vector<vector<int>>& dp) {
-        if (index == prices.size()) {
-            return 0; 
-        }
-        if (dp[index][holding] != -1) {
-            return dp[index][holding];
-        }
-        int doNothing = maxProfitHelper(prices, index + 1, fee, holding, dp);
-        if (holding) {
-            int sell = prices[index] - fee + maxProfitHelper(prices, index + 1, fee, 0, dp);
-            return dp[index][holding] = max(doNothing, sell);
+    int solve(int i, vector<int>& prices, bool bought, vector<vector<int>>& dp, int fee){
+        if(i >= prices.size()) return 0;
+
+        if(dp[i][bought] != -1) return dp[i][bought];
+
+        int skip = solve(i + 1, prices, bought, dp, fee);
+
+        int action = 0;
+        if(!bought){
+            // Buy today
+            action = solve(i + 1, prices, true, dp, fee) - prices[i] - fee;
         } else {
-            int buy = -prices[index] + maxProfitHelper(prices, index + 1, fee, 1, dp);
-            return dp[index][holding] = max(doNothing, buy);
+            // Sell today → profit and continue recursion
+            action = prices[i] + solve(i + 1, prices, false, dp, fee);
         }
+
+        return dp[i][bought] = max(skip, action);
     }
 public:
     int maxProfit(vector<int>& prices, int fee) {
         int n = prices.size();
         vector<vector<int>> dp(n, vector<int>(2, -1));
-        return maxProfitHelper(prices, 0, fee, 0, dp);
+        return solve(0, prices, false, dp, fee);
     }
 };
