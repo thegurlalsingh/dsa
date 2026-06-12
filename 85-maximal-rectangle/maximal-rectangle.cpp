@@ -1,50 +1,67 @@
 class Solution {
 public:
-    int maxRect(vector<int>& mat) {
-        int n = mat.size();
-        stack<pair<int, int>> st;
-        int maxi = 0;
+    int largestRectangleArea(vector<int>& heights) {
+        int n = heights.size();
+
+        vector<int> pse(n), nse(n);
+        stack<int> st;
+
+        // Previous Smaller Element
+        for (int i = 0; i < n; i++) {
+            while (!st.empty() && heights[st.top()] >= heights[i])
+                st.pop();
+
+            pse[i] = st.empty() ? -1 : st.top();
+            st.push(i);
+        }
+
+        while (!st.empty())
+            st.pop();
+
+        // Next Smaller Element
+        for (int i = n - 1; i >= 0; i--) {
+            while (!st.empty() && heights[st.top()] >= heights[i])
+                st.pop();
+
+            nse[i] = st.empty() ? n : st.top();
+            st.push(i);
+        }
+
+        int ans = 0;
 
         for (int i = 0; i < n; i++) {
-            while (!st.empty() && st.top().second > mat[i]) {
-                int next = i - 1;
-                int val = st.top().second;
-                st.pop();
-                int prev = st.empty() ? -1 : st.top().first;
-                maxi = max(maxi, ((next - prev) * val));
-            }
-            st.push({i, mat[i]});
+            int width = nse[i] - pse[i] - 1;
+            int area = heights[i] * width;
+            ans = max(ans, area);
         }
-        while (!st.empty()) {
-            int next = n - 1;
-            int val = st.top().second;
-            st.pop();
-            int prev = st.empty() ? -1 : st.top().first;
-            maxi = max(maxi, ((next - prev) * val));
-        }
-        return maxi;
+
+        return ans;
     }
+
     int maximalRectangle(vector<vector<char>>& matrix) {
-        int n = matrix.size();
-        int m = matrix[0].size();
-        vector<vector<int>> histMat(n, vector<int>(m, 0));
+        if (matrix.empty())
+            return 0;
+
+        int m = matrix.size();
+        int n = matrix[0].size();
+
+        vector<int> heights(n, 0);
+
+        int ans = 0;
+
         for (int i = 0; i < m; i++) {
-            histMat[0][i] = matrix[0][i] - '0';
-        }
-        for (int i = 1; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if (matrix[i][j] == '0') {
-                    histMat[i][j] = 0;
-                    continue;
+
+            for (int j = 0; j < n; j++) {
+                if (matrix[i][j] == '1') {
+                    heights[j]++;
+                } else {
+                    heights[j] = 0;
                 }
-                histMat[i][j] = histMat[i - 1][j] + (matrix[i][j] - '0');
             }
+
+            ans = max(ans, largestRectangleArea(heights));
         }
-        int maxi = 0;
-        for (int i = 0; i < n; i++) {
-            int val = maxRect(histMat[i]);
-            maxi = max(maxi, val);
-        }
-        return maxi;
+
+        return ans;
     }
 };
