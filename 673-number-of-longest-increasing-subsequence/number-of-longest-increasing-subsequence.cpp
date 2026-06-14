@@ -1,59 +1,48 @@
 class Solution {
-    vector<vector<int>> memo;   // memo[start][P]
-
-    int h(vector<int>& nums, vector<int>& dp, int start, int P) {
-        if (P >= 0 && dp[P] == 1) return 1;
-        if (start < 0) return 0;
-
-        if (memo[start][P] != -1) return memo[start][P];
-
-        int ways = 0;
-
-        // skip
-        ways += h(nums, dp, start - 1, P);
-
-        // take
-        if (nums[start] < nums[P] && dp[start] == dp[P] - 1) {
-            ways += h(nums, dp, start - 1, start);
-        }
-
-        return memo[start][P] = ways;
-    }
-
-    int helper(vector<int>& nums) {
+    pair<vector<int>, vector<int>> solve(vector<int>& nums){
         int n = nums.size();
-        if (n == 0) return 0;
 
-        vector<int> dp(n, 1);
-        int maxL = 1;
+        vector<int> len(n, 1);
+        vector<int> cnt(n, 1);
 
-        // LIS dp
+        int maxLen = 1;
+
         for (int i = 0; i < n; i++) {
+
             for (int j = 0; j < i; j++) {
-                if (nums[i] > nums[j]) {
-                    dp[i] = max(dp[i], dp[j] + 1);
+
+                if (nums[j] < nums[i]) {
+
+                    if (len[j] + 1 > len[i]) {
+                        len[i] = len[j] + 1;
+                        cnt[i] = cnt[j];
+                    }
+
+                    else if (len[j] + 1 == len[i]) {
+                        cnt[i] += cnt[j];
+                    }
                 }
             }
-            maxL = max(maxL, dp[i]);
+
+            maxLen = max(maxLen, len[i]);
         }
 
-        // memo size: start from 0..n-1 and P from 0..n-1
-        memo.assign(n, vector<int>(n, -1));
-
-        int total = 0;
-
-        // count LIS ending at each index with dp[i] == maxL
-        for (int i = 0; i < n; i++) {
-            if (dp[i] == maxL) {
-                total += h(nums, dp, i - 1, i);
-            }
-        }
-
-        return total;
+        return {cnt, len};
     }
-
 public:
     int findNumberOfLIS(vector<int>& nums) {
-        return helper(nums);
+        auto t = solve(nums);
+        vector<int> cnt = t.first; 
+        vector<int> len = t.second;
+        int n = nums.size();
+        int maxLen = *max_element(len.begin(), len.end());
+        int ans = 0;
+
+        for (int i = 0; i < n; i++) {
+            if (len[i] == maxLen) {
+                ans += cnt[i];
+            }
+        }
+        return ans;
     }
 };
