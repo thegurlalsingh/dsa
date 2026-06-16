@@ -6,11 +6,11 @@ class Solution {
         if(dp[i][prev + 1] != -1){
             return dp[i][prev + 1];
         }
-        int take = 0;
         int skip = solve(i + 1, prev, nums, dp);
+        int take = 0;
         if(prev == -1 || nums[prev] < nums[i]){
             take = 1 + solve(i + 1, i, nums, dp);
-        }  
+        }
         return dp[i][prev + 1] = max(take, skip);
     }
 public:
