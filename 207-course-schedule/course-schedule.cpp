@@ -1,52 +1,29 @@
 class Solution {
-    vector<int> topo(int N, vector<vector<int>>& adj) {
-
-        queue<int> q;
-        vector<int> indegree(N, 0);
-
-        for (int i = 0; i < N; i++) {
-            for (int neigh : adj[i]) {
-                indegree[neigh]++;
-            }
-        }
-
-        for (int i = 0; i < N; i++) {
-            if (indegree[i] == 0)
-                q.push(i);
-        }
-
-        vector<int> order;
-
-        while (!q.empty()) {
-
-            int node = q.front();
-            q.pop();
-
-            order.push_back(node);
-
-            for (int neigh : adj[node]) {
-
-                indegree[neigh]--;
-
-                if (indegree[neigh] == 0)
-                    q.push(neigh);
-            }
-        }
-
-        return order;
-    }
-
 public:
-    bool canFinish(int numCourses, vector<vector<int>>& p) {
-
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
         vector<vector<int>> adj(numCourses);
-
-        for (auto& x : p) {
-            adj[x[1]].push_back(x[0]);
+        vector<int> inorder(numCourses, 0);
+        vector<int> ans;
+        queue<int> index;
+        for(int i = 0; i < prerequisites.size(); i++){
+            inorder[prerequisites[i][1]]++;
+            adj[prerequisites[i][0]].push_back(prerequisites[i][1]);
         }
-
-        vector<int> t = topo(numCourses, adj);
-
-        return t.size() == numCourses;
+        for(int i = 0; i < inorder.size(); i++){
+            if(inorder[i] == 0){
+                index.push(i);
+            }
+        }
+        while(!index.empty()){
+            int t = index.front(); index.pop();
+            ans.push_back(t);
+            for(int neigh : adj[t]){
+                inorder[neigh]--;
+                if(inorder[neigh] == 0){
+                    index.push(neigh);
+                }
+            }
+        }
+        return ans.size() == numCourses;
     }
 };
