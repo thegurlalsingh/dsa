@@ -1,70 +1,50 @@
 class Solution {
 public:
     int orangesRotting(vector<vector<int>>& grid) {
-        int n = grid.size();
-        int m = grid[0].size();
-
-        // bool freshPresent = false;
-        // for(int i = 0; i < n; i++){
-        //     for(int j = 0; j < m; j++){
-        //         if(grid[i][j] == 1){
-        //             freshPresent = true;
-        //         }
-        //     }
-        // }
-        // if(!freshPresent){
-        //     return 0;
-        // }
-
         queue<pair<int, int>> q;
-        vector<vector<int>> dist(n, vector<int>(m, -1));
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
+        int fresh = 0;
+        vector<vector<int>> visited(grid.size(), vector<int>(grid[0].size(), -1));
+
+        for (int i = 0; i < grid.size(); i++) {
+            for (int j = 0; j < grid[0].size(); j++) {
                 if (grid[i][j] == 2) {
                     q.push({i, j});
-                    dist[i][j] = 0;
+
+                } else if (grid[i][j] == 1) {
+                    fresh++;
                 }
             }
         }
 
-        int minutes = 0;
+        vector<int> dx = {-1, 0, 1, 0};
+        vector<int> dy = {0, 1, 0, -1};
 
-        vector<int> dr = {-1, 0, 1, 0};
-        vector<int> dc = {0, 1, 0, -1};
+        int time = -1;
 
         while (!q.empty()) {
-            auto t = q.front();
-            q.pop();
-            for (int k = 0; k < 4; k++) {
-                int nr = t.first + dr[k];
-                int nc = t.second + dc[k];
-                if (nr >= 0 && nr < n && nc >= 0 && nc < m && grid[nr][nc] != 2 && grid[nr][nc] != 0 && dist[nr][nc] == -1) {
-                    dist[nr][nc] = dist[t.first][t.second] + 1;
-                    q.push({nr, nc});
+            int sz = q.size();
+            while (sz--) {
+                auto [row, column] = q.front();
+                q.pop();
+
+                for (int k = 0; k < 4; k++) {
+                    int ni = row + dx[k];
+                    int nj = column + dy[k];
+
+                    if (ni >= 0 && nj >= 0 && ni < grid.size() &&
+                        nj < grid[0].size() && visited[ni][nj] == -1) {
+                        if (grid[ni][nj] == 1) {
+                            fresh--;
+                            q.push({ni, nj});
+                            visited[ni][nj] = 1;
+                        }
+                    }
                 }
             }
+
+            time++;
         }
 
-        for(int i = 0; i < n; i++){
-            for(int j = 0; j < m; j++){
-                if(dist[i][j] != -1 && dist[i][j] != 0){
-                    minutes = max(minutes, dist[i][j]);
-                }
-            }
-        }
-
-        bool allRotten = true;
-        for(int i = 0; i < n; i++){
-            for(int j = 0; j < m; j++){
-                if(grid[i][j] == 1 && dist[i][j] == -1){
-                    allRotten = false;
-                }
-            }
-        }
-
-        if(allRotten){
-            return minutes == INT_MAX ? -1 : minutes;
-        }
-        return -1;
+        return fresh == 0 ? max(0, time) : -1;
     }
 };
