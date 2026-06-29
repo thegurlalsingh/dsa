@@ -2,7 +2,7 @@ class Solution {
 public:
     vector<int> findMinHeightTrees(int n, vector<vector<int>>& edges) {
         if(n == 1){
-            return {0};
+            return {0}; // this is basically a topological sort problem but for undirected graph which says that whenever you get something like minimum height or finding the roots (becuase they are centre of gravity for trees) just go by this method which is also called peeling of onion method according to which we collect all degrees and push leaves only and then do as like topo sort untill remaining nodes are > 2 rather than old condition of untill queue is empty
         }
 
         vector<int> degree(n, 0);
