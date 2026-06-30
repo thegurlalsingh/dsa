@@ -1,18 +1,19 @@
 class Solution {
-    bool check(int mid, vector<int>& piles, int h){
-        long long hour = 0;
+    bool helper(vector<int>& piles, int h, long long mid){
+        long long m = 0;
         for(int i = 0; i < piles.size(); i++){
-            hour += (piles[i] + mid - 1) / mid;
+            m += (piles[i] + mid - 1) / mid;
         }
-        return hour <= h;
+        return m <= h;
     }
 public:
     int minEatingSpeed(vector<int>& piles, int h) {
-        int i = 1; int j = 1e9;
         int ans = 0;
+        long long i = 1;
+        long long j = 1e10;
         while(i <= j){
-            int mid = (i + j)/2;
-            if(check(mid, piles, h)){
+            long long mid = (i + j) / 2;
+            if(helper(piles, h, mid)){
                 ans = mid;
                 j = mid - 1;
             }
