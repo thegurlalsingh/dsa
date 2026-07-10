@@ -6,8 +6,8 @@ public:
         queue<int> q;
 
         for(int i = 0; i < prerequisites.size(); i++){
-            adj[prerequisites[i][1]].push_back(prerequisites[i][0]);
-            inorder[prerequisites[i][0]]++;
+            adj[prerequisites[i][0]].push_back(prerequisites[i][1]);
+            inorder[prerequisites[i][1]]++;
         }
 
         for(int i = 0; i < inorder.size(); i++){
