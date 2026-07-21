@@ -1,30 +1,51 @@
 class Solution {
 public:
     int maxActiveSectionsAfterTrade(string s) {
-        int ones = 0;
-        for (int i = 0; i < s.size(); i++) 
-            if (s[i] == '1') 
-                ones++;
-        
-        string t = "1" + s + "1";
-        vector<int> v;
-        int cnt = 1;
-        
-        for (int i = 1; i < t.size(); i++) {
-            if (t[i] == t[i - 1]) 
-                cnt++;
-            else {
-                v.push_back(cnt);
-                cnt = 1;
+        string aug = "1" + s + "1";
+
+        int active = 0;
+        for (char c : s)
+            active += (c == '1');
+
+        int ans = active;
+
+        int leftZero = -1;
+        int oneBlock = 0;
+        int rightZero = 0;
+
+        int i = 0;
+        while (i < aug.size()) {
+
+            if (aug[i] == '0') {
+                int len = 0;
+                while (i < aug.size() && aug[i] == '0') {
+                    len++;
+                    i++;
+                }
+
+                if (leftZero == -1)
+                    leftZero = len;
+                else
+                    rightZero = len;
+            }
+            else { 
+                int len = 0;
+                while (i < aug.size() && aug[i] == '1') {
+                    len++;
+                    i++;
+                }
+
+                if (leftZero != -1 && oneBlock > 0 && rightZero > 0) {
+                    ans = max(ans, active + leftZero + rightZero);
+
+                    leftZero = rightZero;
+                    rightZero = 0;
+                }
+
+                oneBlock = len;
             }
         }
-        v.push_back(cnt);
-        
-        int mx = 0;
-        for (int i = 2; i < (int)v.size() - 2; i += 2) 
-            mx = max(mx, v[i - 1] + v[i + 1]);
-        
-        return ones + mx;
+
+        return ans;
     }
 };
-
