@@ -1,52 +1,49 @@
 class Solution {
-    pair<bool, int> helper(string& temp_source, string& temp_target, string& rule) {
-        bool ok = true;
-        int count = 0;
-        for (int i = 0; i < temp_source.size(); i++) {
-            if (rule[i] != '*' && (temp_source[i] != rule[i])) {
-                ok = false;
-                break;
-            } else if (rule[i] == '*') {
-                count++;
-            }
-        }
-
-        return {ok, count};
-    }
-
-    int solve(int i, string& source, string& target, vector<vector<string>>& rules, vector<int>& costs, vector<int>& dp) {
-        if (i >= source.size()) {
-            return 0;
-        }
-        if(dp[i] != -2){
-            return dp[i];
-        }
-        int ans = INT_MAX;
-        if (source[i] == target[i]) {
-            ans = min(ans, solve(i + 1, source, target, rules, costs, dp));
-        }
-        for (int j = 0; j < rules.size(); j++) {
-            int len = rules[j][0].size();
-            if (i + len <= source.size()) {
-                string temp_source = source.substr(i, len);
-                string temp_target = target.substr(i, len);
-                pair<bool, int> k = helper(temp_source, temp_target, rules[j][0]);
-                if (k.first && (temp_target == rules[j][1])) {
-                    int t = solve(i + len, source, target, rules, costs, dp);
-                    if (t != INT_MAX) {
-                        ans = min(ans, costs[j] + k.second + t);
-                    }
+    int check(string& u, string& temp_u){
+        int ans = 0;
+        for(int i = 0; i < u.size(); i++){
+            if(u[i] != temp_u[i]){
+                if(u[i] == '*'){
+                    ans++;
+                }
+                else{
+                    ans = -1; break;
                 }
             }
         }
-        
-
-        return dp[i] = ans;
+        return ans;
     }
+    int solve(int i, string& source, string& target, vector<vector<string>>& rules, vector<int>& costs, vector<int>& dp){
+        if(i >= source.size()){
+            return 0;
+        }
+        if(dp[i] != -1){
+            return dp[i];
+        }
+        int cost = INT_MAX;
 
+        if(source[i] == target[i]){
+            cost = min(cost, solve(i + 1, source, target, rules, costs, dp));
+        }
+
+        for(int j = 0; j < rules.size(); j++){
+            string u = rules[j][0]; string v = rules[j][1];
+            string temp_u = source.substr(i, u.size());
+            string temp_v = target.substr(i, v.size());
+            int p = check(u, temp_u);
+            if(p != -1 && (v == temp_v)){
+            int t = solve(i + temp_u.size(), source, target, rules, costs, dp);
+                if(t != INT_MAX){
+                    int temp_cost = costs[j] + p + t;
+                    cost = min(cost, temp_cost);
+                }     
+            }
+        }
+        return dp[i] = cost;
+    }
 public:
     int minCost(string source, string target, vector<vector<string>>& rules, vector<int>& costs) {
-        vector<int> dp(source.size() + 1, -2);
+        vector<int> dp(source.size(), -1);
         int ans = solve(0, source, target, rules, costs, dp);
         return ans == INT_MAX ? -1 : ans;
     }
