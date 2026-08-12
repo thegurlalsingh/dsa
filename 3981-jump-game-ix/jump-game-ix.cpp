@@ -1,72 +1,106 @@
-class DSU{
-    private:
+#include <bits/stdc++.h>
+using namespace std;
+
+class DisjointSet {
     vector<int> parent, rank;
-    
-    public : 
-    DSU(int n){
+public:
+    DisjointSet(int n) {
         parent.resize(n);
         rank.resize(n, 0);
-        for(int i = 0; i < n; i++){
-            parent[i] = i;
+        for (int i = 0; i < n; i++) parent[i] = i;
+    }
+
+    int findUPar(int node) {
+        if (node == parent[node]) return node;
+        return parent[node] = findUPar(parent[node]);
+    }
+
+    void unionByRank(int u, int v) {
+        int pu = findUPar(u);
+        int pv = findUPar(v);
+        if (pu == pv) return;
+        if (rank[pu] < rank[pv]) parent[pu] = pv;
+        else if (rank[pv] < rank[pu]) parent[pv] = pu;
+        else {
+            parent[pv] = pu;
+            rank[pu]++;
         }
-    }
-    
-    int find(int x){
-        if(parent[x] == x) return x;
-        
-        return parent[x] = find(parent[x]);
-    }
-    
-    void unite(int x , int y){
-        int px = find(x);
-        int py = find(y);
-        
-        if(px == py) return;
-        
-        if(rank[px] > rank[py]){
-            parent[py] = px;
-        }else if(rank[py] > rank[px]){
-            parent[px] = py;
-        }else{
-                parent[px] = py;
-                rank[py]++;
-        }
-    }
-    
-    bool isConnected(int x, int y){
-        return find(x) == find(y);
     }
 };
-
 
 class Solution {
 public:
     vector<int> maxValue(vector<int>& nums) {
         int n = nums.size();
-        DSU d(n);
+        DisjointSet dsu(n);
 
         stack<int> st;
+
+        // Pass 1: Left to Right (forward jumps: nums[j] < nums[i])
+        // for (int i = 0; i < n; i++) {
+        //     int prev = i;
+        //     while (!st.empty() && nums[st.top()] > nums[i]) {
+        //         dsu.unionByRank(i, st.top());
+        //         prev = st.top();
+        //         st.pop();
+        //     }
+        //     if (nums[prev] < nums[i]) st.push(i);
+        //     else st.push(prev);
+        // }
+
+        // while (!st.empty()) st.pop();
+
+        // Pass 2: Right to Left (backward jumps: nums[j] > nums[i])
+        // for (int i = n - 1; i >= 0; i--) {
+        //     int prev = i;
+        //     while (!st.empty() && nums[st.top()] < nums[i]) {
+        //         dsu.unionByRank(i, st.top());
+        //         prev = st.top();
+        //         st.pop();
+        //     }
+        //     if (nums[prev] > nums[i]) st.push(i);
+        //     else st.push(prev);
+        // }
+
         for(int i = 0; i < n; i++){
             int x = i;
             while(!st.empty() && nums[st.top()] > nums[i]){
                 if(nums[st.top()] > nums[x]) x = st.top();
-                d.unite(st.top(), i);
+                dsu.unionByRank(st.top(), i);
                 st.pop();
             }
-            d.unite(x, i);
+            dsu.unionByRank(x, i);
             st.push(x);
         }
 
-        vector<int> maxi(n, 0);
-        for(int i = 0; i < n; i++){
-            int p = d.find(i);
-            maxi[p] = max(maxi[p], nums[i]);
+        while (!st.empty()) st.pop();
+
+        for(int i = n - 1; i >= 0; i--){
+            int x = i;
+            while(!st.empty() && nums[st.top()] < nums[i]){
+                if(nums[st.top()] > nums[x]) x = st.top();
+                dsu.unionByRank(st.top(), i);
+                st.pop();
+            }
+            dsu.unionByRank(x, i);
+            st.push(x);
         }
 
-        vector<int> ans(n);
-        for(int i = 0; i < n; i++){
-            ans[i] = maxi[d.find(i)];
+        // Group indices by component
+        vector<vector<int>> groups(n);
+        for (int i = 0; i < n; i++) {
+            groups[dsu.findUPar(i)].push_back(i);
         }
+
+        // Assign max per component
+        vector<int> ans(n);
+        for (auto &comp : groups) {
+            if (comp.empty()) continue;
+            int maxi = INT_MIN;
+            for (int idx : comp) maxi = max(maxi, nums[idx]);
+            for (int idx : comp) ans[idx] = maxi;
+        }
+
         return ans;
     }
 };
