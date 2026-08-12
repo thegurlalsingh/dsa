@@ -78,7 +78,7 @@ public:
         for(int i = n - 1; i >= 0; i--){
             int x = i;
             while(!st.empty() && nums[st.top()] < nums[i]){
-                if(nums[st.top()] > nums[x]) x = st.top();
+                if(nums[st.top()] < nums[x]) x = st.top();
                 dsu.unionByRank(st.top(), i);
                 st.pop();
             }
