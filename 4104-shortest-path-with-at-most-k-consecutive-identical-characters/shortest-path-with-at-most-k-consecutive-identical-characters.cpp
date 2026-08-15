@@ -41,7 +41,7 @@ public:
                     if (new_wt < dist[neigh][k]) {
                         dist[neigh][k] = new_wt;
                         pq.push({new_wt, neigh, neigh_char, k});
-                    }
+                    } // one conceptual mistake i was doing here, i mean it was atmost k consecutive elements allowed so when there is no consecutiveness so it should again become k, it should not be like decreamenting always, it will get reset here 
                 }
             }
         }
