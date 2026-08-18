@@ -1,19 +1,20 @@
 class Solution {
 public:
     int findMin(vector<int>& nums) {
-        int i = 0; int j = nums.size() - 1;
-        int ans = INT_MAX;
-        while(i <= j){
-            int mid = (i + j) / 2;
-            if(nums[mid] >= nums[i]){ // right part is sorted
-                ans = min(ans, nums[i]);
-                i = mid + 1;
-            }  
-            else{           // left part is sorted
-                ans = min(ans, nums[mid]);
-                j = mid - 1;
+        int low = 0;
+        int high = nums.size() - 1;
+        int mini = INT_MAX;
+        while (low <= high) {
+            int mid = (high + low)/2;
+
+            if (nums[low] <= nums[mid]) {
+                mini = min(mini, nums[low]); // for left part, if its sorted then element at low will be minimum
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+                mini = min(mini, nums[mid]); // if right part is sorted, then element at mid would be minimum
             }
         }
-        return ans;
+        return mini;
     }
 };
