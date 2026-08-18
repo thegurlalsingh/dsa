@@ -1,32 +1,31 @@
 class Solution {
-    bool check(int cap, vector<int>& weights, int days) {
-        int d = 1;
-        long long curr = 0;
-        for (int w : weights) {
-            if (w > cap)
-                return false;
-            if (curr + w <= cap) {
-                curr += w;
-            } else {
-                d++;
-                curr = w;
+    bool helper(vector<int>& weights, int days, long long mid){
+        long long total_days = 1;
+        long long temp = 0;
+        for (int i = 0; i < weights.size(); i++) {
+            if (temp + weights[i] <= mid) {
+                temp += weights[i];
+            }
+            else {
+                total_days++;
+                temp = weights[i];
             }
         }
-        return d <= days;
+        return total_days <= days;
     }
-
 public:
     int shipWithinDays(vector<int>& weights, int days) {
-        int i = 1;
-        int j = 1e9;
-        int ans = 0;
-        while (i <= j) {
-            int mid = (i + j) / 2;
-            if (check(mid, weights, days)) {
+        int low = *max_element(weights.begin(), weights.end());
+        int high = accumulate(weights.begin(), weights.end(), 0);
+        long long ans = 0;
+        while(low <= high){
+            long long mid = (low + high) / 2;
+            if(helper(weights, days, mid)){ 
                 ans = mid;
-                j = mid - 1;
-            } else {
-                i = mid + 1;
+                high = mid - 1;
+            }
+            else{
+                low = mid + 1;
             }
         }
         return ans;
