@@ -11,16 +11,16 @@
  */
 class Solution {
 public:
-    bool isSameTree(TreeNode* p, TreeNode* q) {
-        if(p == nullptr && q == nullptr) {
+    bool isSameTree(TreeNode* root1, TreeNode* root2){
+        if(!root1 && !root2){
             return true;
-        } // i forgot this base case when both are nullptr, its still true
-        if(p == nullptr || q == nullptr){
+        }
+        if(!root1 || !root2){
             return false;
         }
-        if(p->val != q->val){
+        if(root1->val != root2->val){
             return false;
         }
-        return isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
+        return isSameTree(root1->right, root2->right) && isSameTree(root1->left, root2->left);
     }
 };
