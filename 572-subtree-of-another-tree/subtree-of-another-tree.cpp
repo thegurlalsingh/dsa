@@ -6,35 +6,42 @@
  *     TreeNode *right;
  *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
  *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left),
- * right(right) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
  * };
  */
 class Solution {
-    bool isSame(TreeNode* a, TreeNode* b) {
-        if (!a && !b)
-            return true;
-
-        if (!a || !b)
-            return false;
-
-        if (a->val != b->val)
-            return false;
-
-        return isSame(a->left, b->left) && isSame(a->right, b->right);
+    void solve(vector<TreeNode*>& nodes, TreeNode* root, int s){
+        if(!root){
+            return ;
+        }
+        if(root->val == s){
+            nodes.push_back(root);
+        }
+        solve(nodes, root->left, s);
+        solve(nodes, root->right, s);
     }
-
+    bool isSame(TreeNode* root1, TreeNode* root2){
+        if(!root1 && !root2){
+            return true;
+        }
+        if(!root1 || !root2){
+            return false;
+        }
+        if(root1->val != root2->val){
+            return false;
+        }
+        return isSame(root1->right, root2->right) && isSame(root1->left, root2->left);
+    }
 public:
     bool isSubtree(TreeNode* root, TreeNode* subRoot) {
-        if (root == nullptr) {
-            return false;
+        vector<TreeNode*> nodes;
+        solve(nodes, root, subRoot->val);
+        for(int i = 0; i < nodes.size(); i++){
+            bool temp = isSame(nodes[i], subRoot);
+            if(temp){
+                return true;
+            }
         }
-
-        if (isSame(root, subRoot)) {
-            return true;
-        }
-
-        return isSubtree(root->left, subRoot) ||
-               isSubtree(root->right, subRoot);
+        return false;
     }
 };
