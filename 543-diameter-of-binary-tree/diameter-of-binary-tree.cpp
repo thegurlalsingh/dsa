@@ -10,22 +10,21 @@
  * };
  */
 class Solution {
-    int solve(TreeNode* root, int& ans){
-        if(root == nullptr){
-            return 0;
-        }
+    int ans;
+    int solve(TreeNode* root) {
+    if (!root)
+        return 0;
 
-        int left = solve(root->left, ans);
-        int right = solve(root->right, ans);
+    int leftDepth = solve(root->left);
+    int rightDepth = solve(root->right);
 
-        ans = max(ans, left + right);
+    ans = max(ans, leftDepth + rightDepth);
 
-        return 1 + max(left, right);
-    }
+    return 1 + max(leftDepth, rightDepth);
+}
 public:
     int diameterOfBinaryTree(TreeNode* root) {
-        int ans = 0;
-        int t = solve(root, ans);
+        solve(root);
         return ans;
     }
 };
