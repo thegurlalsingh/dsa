@@ -10,17 +10,20 @@
  * };
  */
 class Solution {
-    bool solve(long long mini, long long maxi, TreeNode* root){
-        if(root == nullptr){
+    bool solve(TreeNode* root, long long mx, long long mn){
+        if(!root){
             return true;
         }
-        if(root->val <= mini || root->val >= maxi){
+        if(mn >= root->val || mx <= root->val){
             return false;
         }
-        return solve(mini, root->val, root->left) && solve(root->val, maxi, root->right);
+        return solve(root->left, root->val, mn) && solve(root->right, mx, root->val);
     }
 public:
     bool isValidBST(TreeNode* root) {
-        return solve(-1e12 - 3, 1e12 + 3, root);
+        if(!root->left && !root->right){
+            return true;
+        }
+        return solve(root, LLONG_MAX, LLONG_MIN);
     }
 };
