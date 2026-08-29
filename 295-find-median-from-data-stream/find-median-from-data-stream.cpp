@@ -1,38 +1,32 @@
 class MedianFinder {
 public:
-multiset<int> ms;
-multiset<int>::iterator mid;
+        multiset<int> mt;
+        multiset<int>::iterator it;
     MedianFinder() {
-
     }
     
     void addNum(int num) {
-        ms.insert(num);
-        if(ms.size() == 1){
-            mid = ms.begin();
+        if(mt.empty()){
+            mt.insert(num);
+            it = mt.begin();
         }
         else{
-            if(ms.size() % 2 == 0){
-                if(num < *mid){
-                    mid--;
-                }
+            mt.insert(num);
+            int sz = mt.size() - 1;
+            if(num < *it && sz % 2 != 0){
+                it--;
             }
-            else{
-                if(num >= *mid){
-                    mid++;
-                }
+            if(num >= *it && sz % 2 == 0){
+                it++;
             }
         }
-
     }
     
     double findMedian() {
-        if(ms.size() % 2 == 0){
-            int a = *mid;
-            int b = *next(mid);
-            return (a + b) / 2.0;
+        if(mt.size() % 2 != 0){
+            return (double)(*it);
         }
-        return *mid/1.0;
+        return (*it + *next(it)) / 2.0;
     }
 };
 
