@@ -1,18 +1,40 @@
 class Solution {
 public:
     int leastInterval(vector<char>& tasks, int n) {
-        vector<int> mp(26,0);
-        int max_freq=0, count_maxfreq=0, sz=tasks.size();
-        for(char i:tasks){
-            mp[i-'A']++;  
-            if(mp[i-'A']>max_freq){
-                max_freq=mp[i-'A'];
-            }
-        }   
-        for(int i=0;i<26;i++){
-            if(mp[i]==max_freq) count_maxfreq++; 
+
+        priority_queue<pair<int, char>, vector<pair<int, char>>, greater<pair<int, char>>> cooldown;
+        priority_queue<pair<int, char>> freq;
+
+        unordered_map<char, int> mp;
+        for (char c : tasks) {
+            mp[c]++;
         }
-        int time= (max_freq-1)*(n+1)+count_maxfreq; 
-        return max(time,sz);
+        for (auto& [c, f] : mp) {
+            freq.push({f, c});
+        }
+        
+        int time = 0;
+        int count = tasks.size();
+        while (count > 0) {
+            // while (!pq.empty() && mp[pq.top().second] == 0) {
+            //     pq.pop();
+            // }
+            while(!cooldown.empty() && cooldown.top().first == time) {
+                auto [availableTime, c] = cooldown.top(); cooldown.pop();
+                if (mp[c] > 0) {
+                    freq.push({mp[c], c});
+                }
+            }
+            if(!freq.empty()){
+                auto [f, c] = freq.top(); freq.pop();
+                mp[c]--;
+                count--;
+                cooldown.push({time + n + 1, c});
+                
+            }
+            time++;
+        }
+
+        return time;
     }
 };
