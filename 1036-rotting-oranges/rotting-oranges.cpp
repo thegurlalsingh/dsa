@@ -1,50 +1,50 @@
 class Solution {
+    vector<pair<int, int>> directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+
+    struct PairHash {
+        size_t operator()(const pair<int, int>& p) const {
+            return hash<int>()(p.first) ^ (hash<int>()(p.second) << 1);
+        }
+    };
+
 public:
     int orangesRotting(vector<vector<int>>& grid) {
-        queue<pair<int, int>> q;
-        int fresh = 0;
-        vector<vector<int>> visited(grid.size(), vector<int>(grid[0].size(), -1));
-
-        for (int i = 0; i < grid.size(); i++) {
-            for (int j = 0; j < grid[0].size(); j++) {
+        unordered_set<pair<int, int>, PairHash> s;
+        int m = grid.size();
+        int n = grid[0].size();
+        queue<tuple<int, int, int>> q;
+        vector<vector<int>> vis(m, vector<int>(n, 0));
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
                 if (grid[i][j] == 2) {
-                    q.push({i, j});
-
+                    q.push({i, j, 0});
+                    vis[i][j] = 1;
                 } else if (grid[i][j] == 1) {
-                    fresh++;
+                    s.insert({i, j});
                 }
             }
         }
-
-        vector<int> dx = {-1, 0, 1, 0};
-        vector<int> dy = {0, 1, 0, -1};
-
-        int time = -1;
 
         while (!q.empty()) {
-            int sz = q.size();
-            while (sz--) {
-                auto [row, column] = q.front();
-                q.pop();
+            auto [r, c, t] = q.front();
+            q.pop();
 
-                for (int k = 0; k < 4; k++) {
-                    int ni = row + dx[k];
-                    int nj = column + dy[k];
+            for (auto [dr, dc] : directions) {
+                int nr = r + dr;
+                int nc = c + dc;
 
-                    if (ni >= 0 && nj >= 0 && ni < grid.size() &&
-                        nj < grid[0].size() && visited[ni][nj] == -1) {
-                        if (grid[ni][nj] == 1) {
-                            fresh--;
-                            q.push({ni, nj});
-                            visited[ni][nj] = 1;
-                        }
+                if (nr >= 0 && nr < m && nc >= 0 && nc < n &&
+                    (grid[nr][nc] == 1) && !vis[nr][nc]) {
+                    s.erase({nr, nc});
+                    vis[nr][nc] = 1;
+                    if (s.empty()) { // Check the condition at the exact point where the state you're tracking changes. Thats why we moved it from up to down
+                        return t + 1;
                     }
+                    q.push({nr, nc, t + 1});
                 }
             }
-
-            time++;
         }
 
-        return fresh == 0 ? max(0, time) : -1;
+        return s.empty() ? 0 : -1;
     }
 };
