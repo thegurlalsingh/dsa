@@ -33,13 +33,13 @@ public:
             adj[u].push_back({v, c});
             rev[v].push_back({u, c});
         }
-        vector<long long> dist1 = solve(n, adj, src1);
-        vector<long long> dist2 = solve(n, adj, src2);
-        vector<long long> dist3 = solve(n, rev, dest);
+        vector<long long> dist1 = solve(n, adj, src1); // this is from src1 -> some index i
+        vector<long long> dist2 = solve(n, adj, src2); // this is from src2 -> some index i
+        vector<long long> dist3 = solve(n, rev, dest); // this is from dest -> some index i
         long long mini = LLONG_MAX;
         for(int i = 0; i < n; i++){
             if(dist1[i] != LLONG_MAX && dist2[i] != LLONG_MAX && dist3[i] != LLONG_MAX){
-                mini = min(mini, dist1[i] + dist2[i] + dist3[i]);
+                mini = min(mini, dist1[i] + dist2[i] + dist3[i]); // there should be some index where src1 and src2 both can be merged and from that index dest should be reachable
             }
         }
         return mini == LLONG_MAX ? -1 : mini;
