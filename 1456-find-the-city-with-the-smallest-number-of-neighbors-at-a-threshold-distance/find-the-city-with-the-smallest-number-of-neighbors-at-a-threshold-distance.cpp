@@ -1,49 +1,52 @@
 class Solution {
+    int solve(int node, vector<vector<pair<int, int>>>& adj, int distanceThreshold){
+        int cities = 0;
+        vector<int> dist(adj.size(), INT_MAX);
+        dist[node] = 0;
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> q;
+        q.push({0, node});
+        while(!q.empty()){
+            auto [c, t] = q.top(); q.pop();
+            
+            for(auto& [neigh, nc] : adj[t]){
+                if(dist[neigh] > c + nc){
+                    dist[neigh] = c + nc;
+                    q.push({dist[neigh], neigh});
+                }
+            }
+        }
+
+        for(int i = 0; i < adj.size(); i++){
+            if(dist[i] <= distanceThreshold && i != node){
+                cities++;
+            }
+        }
+
+        return cities;
+    }
 public:
     int findTheCity(int n, vector<vector<int>>& edges, int distanceThreshold) {
-        vector<vector<int>> dist(n, vector<int>(n, 1e9));
+        vector<vector<pair<int, int>>> adj(n);
+        for (int i = 0; i < edges.size(); i++) {
+            int u = edges[i][0];
+            int v = edges[i][1];
+            int c = edges[i][2];
+            adj[u].push_back({v, c});
+            adj[v].push_back({u, c});
+        }
+
+        int idx = 0;
+        int city = INT_MAX;
         for(int i = 0; i < n; i++){
-            dist[i][i] = 0;
-        }
-        
-        for(auto& e : edges){
-            int u = e[0];
-            int v = e[1];
-            int wt = e[2];
-
-            dist[u][v] = wt;
-            dist[v][u] = wt;
-        }
-
-        for(int k = 0; k < n; k++){
-            for(int i = 0; i < n; i++){
-                for(int j = 0; j < n; j++){
-                    if(dist[i][k] == 1e9 || dist[k][j] == 1e9){
-                        continue;
-                    }
-                    dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
-                }
+            int t = solve(i, adj, distanceThreshold);
+            if(city > t){
+                idx = i; city = t;
+            }
+            if(city == t){
+                idx = max(idx, i);
             }
         }
 
-        int max_cities = 1e9; int ans = -1;
-        
-        for(int i = 0; i < n; i++){
-            int temp = 0;
-
-            for(int j = 0; j < n; j++){
-                if(dist[i][j] != 1e9 && dist[i][j] <= distanceThreshold){
-                    temp += 1;
-                }
-            }
-
-            if(temp <= max_cities){
-                max_cities = temp;
-                ans = max(ans, i);
-            }
-
-        }
-
-        return ans;
+        return idx;
     }
 };
