@@ -1,61 +1,47 @@
-typedef long long ll;
-typedef pair<ll, int> P;   // (cost, node)
-
 class Solution {
-    vector<ll> dijkstra(int n, vector<vector<pair<int,int>>>& adj, int src) {
-        vector<ll> dist(n, 1e18);
-        priority_queue<P, vector<P>, greater<P>> pq;
-
+    vector<long long> solve(int n, vector<vector<pair<int, int>>>& adj, int src){
+        vector<long long> dist(n, LLONG_MAX);
         dist[src] = 0;
-        pq.push({0, src});
+        priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<pair<long long, int>>> pq;
+        pq.push({0, src}); // for destination to every node distance -> push dest as starting node
 
-        while (!pq.empty()) {
-            auto [cost, u] = pq.top(); pq.pop();
-            if (cost > dist[u]) continue;
+        while(!pq.empty()){
+            auto [c, p] = pq.top(); pq.pop();
+            
+            if (c > dist[p]){
+                continue;
+            }
 
-            for (auto &p : adj[u]) {
-                int v = p.first;
-                ll w = p.second;
-
-                if (cost + w < dist[v]) {
-                    dist[v] = cost + w;
-                    pq.push({dist[v], v});
+            for(auto [neigh, nc] : adj[p]){
+                if(dist[neigh] > nc + c){
+                    dist[neigh] = nc + c;
+                    pq.push({dist[neigh], neigh});
                 }
             }
         }
+
         return dist;
     }
-
 public:
-    long long minimumWeight(int n, vector<vector<int>>& edges,
-                            int src1, int src2, int dest) {
-
-        // normal graph
-        vector<vector<pair<int,int>>> adj(n);
-
-        // reversed graph
-        vector<vector<pair<int,int>>> rev(n);
-
-        for (auto &e : edges) {
-            int u = e[0], v = e[1], w = e[2];
-            adj[u].push_back({v, w});
-            rev[v].push_back({u, w});   // reverse edge
+    long long minimumWeight(int n, vector<vector<int>>& edges, int src1, int src2, int dest) {
+        vector<vector<pair<int, int>>> adj(n);
+        vector<vector<pair<int, int>>> rev(n);
+        for(int i = 0; i < edges.size(); i++){
+            int u = edges[i][0];
+            int v = edges[i][1];
+            int c = edges[i][2];
+            adj[u].push_back({v, c});
+            rev[v].push_back({u, c});
         }
-
-        // run Dijkstra 3 times
-        vector<ll> d1 = dijkstra(n, adj, src1);  // src1 -> every node
-        vector<ll> d2 = dijkstra(n, adj, src2);  // src2 -> every node
-        vector<ll> dt = dijkstra(n, rev, dest);  // every node -> dest
-
-        ll ans = 1e18;
-
-        // try every meeting point X
-        for (int X = 0; X < n; X++) {
-            if (d1[X] == 1e18 || d2[X] == 1e18 || dt[X] == 1e18) continue;
-
-            ans = min(ans, d1[X] + d2[X] + dt[X]);
+        vector<long long> dist1 = solve(n, adj, src1);
+        vector<long long> dist2 = solve(n, adj, src2);
+        vector<long long> dist3 = solve(n, rev, dest);
+        long long mini = LLONG_MAX;
+        for(int i = 0; i < n; i++){
+            if(dist1[i] != LLONG_MAX && dist2[i] != LLONG_MAX && dist3[i] != LLONG_MAX){
+                mini = min(mini, dist1[i] + dist2[i] + dist3[i]);
+            }
         }
-
-        return ans == 1e18 ? -1 : ans;
+        return mini == LLONG_MAX ? -1 : mini;
     }
 };
