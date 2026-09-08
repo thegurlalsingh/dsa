@@ -1,41 +1,86 @@
+class DSU {
+    vector<int> parent;
+    vector<int> rank;
+
+public:
+    DSU(int n) {
+        parent.resize(n);
+        rank.resize(n, 0);
+
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+        }
+    }
+
+    int find(int x) {
+        if (parent[x] == x)
+            return x;
+
+        return parent[x] = find(parent[x]);
+    }
+
+    void unite(int a, int b) {
+        a = find(a);
+        b = find(b);
+
+        if (a == b)
+            return;
+
+        if (rank[a] < rank[b]) {
+            parent[a] = b;
+        }
+        else if (rank[a] > rank[b]) {
+            parent[b] = a;
+        }
+        else {
+            parent[b] = a;
+            rank[a]++;
+        }
+    }
+};
+
 class Solution {
+    int manhattan(int x1, int y1, int x2, int y2){
+        return abs(x1 - x2) + abs(y1 - y2);
+    }
+
 public:
     int minCostConnectPoints(vector<vector<int>>& points) {
-        int n = points.size();
-        vector<vector<pair<int, int>>> adj(n);
-        for (int i = 0; i < points.size(); i++) {
-            int x1 = points[i][0]; int y1 = points[i][1];
+        DSU ds(points.size());
+        vector<vector<int>> edges;
+        for(int i = 0; i < points.size(); i++){
             for(int j = 0; j < points.size(); j++){
-                int x2 = points[j][0]; int y2 = points[j][1];
-                int dis = abs(x2 - x1) + abs(y2 - y1);
-                adj[i].push_back({j, dis});
-                adj[j].push_back({i, dis});
+                int p1 = i;
+                int p2 = j;
+                int dis = manhattan(points[i][0], points[i][1], points[j][0], points[j][1]);
+                edges.push_back({p1, p2, dis});
             }
         }
+        sort(edges.begin(), edges.end(),
+        [](const vector<int>& a, const vector<int>& b) {
+            return a[2] < b[2];
+        });
+        int mstWeight = 0;
+        int edgesUsed = 0;
+        for(auto& edge : edges){
+            int u = edge[0];
+            int v = edge[1];
+            int wt = edge[2];
 
-        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-
-        vector<int> vis(n, 0); 
-        pq.push({0, 0});
-        int sum = 0;
-        while (!pq.empty()) {
-            auto [wt, node] = pq.top();
-            pq.pop();
-            if (vis[node]) {
+            if(ds.find(u) == ds.find(v)){
                 continue;
             }
-            vis[node] = 1;
-            sum += wt;
-            for (auto& it : adj[node]) {
-                int neigh = it.first;
-                int edgeWt = it.second;
 
-                if (!vis[neigh]) {
-                    pq.push({edgeWt, neigh});
-                }
+            mstWeight += wt;
+            edgesUsed++;
+
+            ds.unite(u, v);
+
+            if(edgesUsed == points.size() - 1){
+                break;
             }
         }
 
-        return sum;
+        return mstWeight;
     }
 };
