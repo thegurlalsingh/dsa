@@ -34,27 +34,28 @@ public:
 class Solution {
 public:
     bool equationsPossible(vector<string>& equations) {
-        // sort(equations.rbegin(), equations.rend());
-        // int offset = 26;
         DisjointSet ds(26);
         for(int i = 0; i < equations.size(); i++){
-            if(equations[i][1] == '='){
-                int c1 = equations[i][0] - 'a';
-                int c2 = equations[i][3] - 'a';
-                ds.unionByRank(c1, c2);
+            int chara = equations[i][0] - 'a';
+            int charb = equations[i][3] - 'a';
+            bool equal = equations[i][1] == '=';
+
+            if(equal){
+                ds.unionByRank(chara, charb);
             }
+
         }
 
         for(int i = 0; i < equations.size(); i++){
-            if(equations[i][1] == '!'){
-                int c1 = equations[i][0] - 'a';
-                int c2 = equations[i][3] - 'a';
-                if(ds.findUPar(c1) == ds.findUPar(c2)){
-                    return false;
-                }
-            }
-        }
+            int chara = equations[i][0] - 'a';
+            int charb = equations[i][3] - 'a';
+            bool equal = equations[i][1] == '=';
 
-        return true;
+            if(!equal && (ds.findUPar(chara) == ds.findUPar(charb))){
+                return false;
+            }
+
+        } // dont go in one pass only because see wrong submission, there first inequality is there and then again inequality but it passed return true, so we need a recheck -> thats why first connect all equals and then check if unequal are in same component -> return false else continue
+        return true; 
     }
 };
