@@ -1,50 +1,42 @@
 class Solution {
-    vector<int> tin, low;
-    vector<int> vis;
     vector<vector<int>> bridges;
+    vector<vector<int>> adj;
+    vector<int> tin, low; int timer = 0;
 
-    int timer = 1;
-
-    void dfs(int node, int parent, vector<vector<int>>& adj) {
-
-        vis[node] = 1;
-
-        tin[node] = low[node] = timer++;
-
-        for (int neigh : adj[node]) {
-
-            if (neigh == parent)
+    void dfs(int u, int parent){
+        tin[u] = low[u] = timer++;
+        for(int v : adj[u]){
+            if(v == parent){
                 continue;
-
-            if (!vis[neigh]) {
-
-                dfs(neigh, node, adj);
-
-                low[node] = min(low[node], low[neigh]);
-
-                if (low[neigh] > tin[node]) {
-
-                    bridges.push_back({node, neigh});
+            }
+            if(tin[v] != -1){
+                low[u] = min(low[u], tin[v]);
+            }
+            else{
+                dfs(v, u);
+                low[u] = min(low[u], low[v]);
+                if(low[v] > tin[u]){
+                    bridges.push_back({u, v});
                 }
-            } else {
-
-                low[node] = min(low[node], tin[neigh]);
             }
         }
     }
-
 public:
     vector<vector<int>> criticalConnections(int n, vector<vector<int>>& connections) {
-        vector<vector<int>> adj(n);
-        for (int i = 0; i < connections.size(); i++) {
-            adj[connections[i][0]].push_back(connections[i][1]);
-            adj[connections[i][1]].push_back(connections[i][0]);
+        adj.resize(n);
+        for(auto edge : connections){
+            int u = edge[0];
+            int v = edge[1];
+            adj[u].push_back(v);
+            adj[v].push_back(u);
         }
-        tin.resize(n);
-        low.resize(n);
-        vis.resize(n);
-
-        dfs(0, -1, adj);
+        tin.assign(n, -1);
+        low.assign(n, -1);
+        for(int i = 0; i < n; i++){
+            if(tin[i] == -1){
+                dfs(i, -1);
+            }
+        }
         return bridges;
     }
 };
