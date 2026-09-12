@@ -1,49 +1,38 @@
 class Solution {
-    int dijkstra(int n, vector<vector<pair<int, int>>> &adj, int s, int d, int k) {
-        priority_queue<tuple<int,int, int>, vector<tuple<int,int, int>>, greater<tuple<int,int, int>>> pq;
-
-        vector<vector<int>> dist(n, vector<int>(k + 2, 1e9));
-
-        dist[s][k + 1] = 0;
-        pq.push({0, s, k + 1}); // taking k while doing bfs because k will change doing bfs for different nodes
-
-        while(!pq.empty()) {
-
-            auto [dis, node, k0] = pq.top();
-            pq.pop();
-
-            if(node == d && k0 >= 0){
-                return dis;
-            }
-            
-            if(k0 < 0){
-                continue;
-            }
-
-            if(dis > dist[node][k0])
-                continue;
-
-            for(auto &it : adj[node]) {
-
-                int neigh = it.first;
-                int wt    = it.second;
-
-                if(k0 - 1 >= 0 && (dist[node][k0] + wt < dist[neigh][k0 - 1])) {
-                    dist[neigh][k0 - 1] = dist[node][k0] + wt;
-                    pq.push({dist[neigh][k0 - 1], neigh, k0 - 1});
-                }
+private:
+    int dfs(int currentCity, int remainingStops, int dst, unordered_map<int, vector<pair<int, int>>>& adj, vector<vector<int>>& memo) {
+        if (remainingStops < 0) {
+            return INT_MAX; 
+        }
+        if (currentCity == dst) {
+            return 0; 
+        }
+        if (memo[currentCity][remainingStops] != -1) {
+            return memo[currentCity][remainingStops]; 
+        }
+        
+        int minCost = INT_MAX;
+        
+        for (auto& [nextCity, cost] : adj[currentCity]) {
+            int nextCost = dfs(nextCity, remainingStops - 1, dst, adj, memo);
+            if (nextCost != INT_MAX) {
+                minCost = min(minCost, cost + nextCost);
             }
         }
-
-        return -1;
+        
+        return memo[currentCity][remainingStops] = minCost;
     }
 
 public:
     int findCheapestPrice(int n, vector<vector<int>>& flights, int src, int dst, int k) {
-        vector<vector<pair<int, int>>> adj(n);
-        for(int i = 0; i < flights.size(); i++){
-            adj[flights[i][0]].push_back({flights[i][1], flights[i][2]});
+        unordered_map<int, vector<pair<int, int>>> adj;
+        for (auto& flight : flights) {
+            adj[flight[0]].emplace_back(flight[1], flight[2]);
         }
-        return dijkstra(n, adj, src, dst, k);
+        
+        vector<vector<int>> memo(n, vector<int>(k + 2, -1)); // as we are going from 0 to k + 1 stops we need k + 2 flights, thats why here it is k + 2
+        
+        int result = dfs(src, k + 1, dst, adj, memo); // starting from k + 1 because for atmost x stops -> x + 1 flights are needed
+        return result == INT_MAX ? -1 : result;
     }
 };
