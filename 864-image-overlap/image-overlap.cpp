@@ -1,7 +1,7 @@
 class Solution {
     // int manhattan(int x1, int y1, int x2, int y2){
     //     return abs(x2 - x1) + abs(y2 - y1);
-    // }
+    // } // done use manhattan distance because with manhattan distance we will lose direction but with storing actual cordinates we can use them to shift ones cells in img1 
 
     int solve(int i, int j, vector<pair<int, int>>& ones1, vector<pair<int, int>>& ones2, vector<vector<int>>& dp){
         if(i >= ones1.size() || j >= ones2.size()){
@@ -50,7 +50,7 @@ public:
                 int dx = x2 - x1;
                 int dy = y2 - y1;
                 mp[{dx, dy}]++;
-            }
+            } // storing that difference in cordinates which occurs the most because that is the main overlapping difference between img1 and img2
         }
         
         int maxiFreq = 0; pair<int, int> maxi = {0, 0};
