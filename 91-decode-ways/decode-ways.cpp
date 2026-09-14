@@ -1,30 +1,40 @@
 class Solution {
-public:
-    int numDecodingsTopDown(string s, int index, vector<int>& memo) {
-        if (index == s.length()) {
+    int solve(int j, vector<int> &dp, string& s) {
+        if (j >= s.size()) {
             return 1;
         }
-
-        if (s[index] == '0') {
+        if(dp[j] != -1){
+            return dp[j];
+        }
+        int ans = 0;
+        if (s[j] == '1') {
+            ans += solve(j + 1, dp, s);
+            if (j + 1 < s.size()) {
+                ans += solve(j + 2, dp, s);
+            }
+        } 
+        else if (s[j] == '2') {
+            ans += solve(j + 1, dp, s);
+            if (j + 1 < s.size() && (s[j + 1] >= '0' && s[j + 1] <= '6')) {
+                ans += solve(j + 2, dp, s);
+            }
+        } 
+        else if(s[j] == '0') {
             return 0;
         }
-
-        if (memo[index] != -1) {
-            return memo[index];
+        else{
+            ans += solve(j + 1, dp, s);
         }
-
-        int ways = numDecodingsTopDown(s, index + 1, memo);
-
-        if (index + 1 < s.length() && (s[index] == '1' || (s[index] == '2' && s[index + 1] <= '6'))) {
-            ways += numDecodingsTopDown(s, index + 2, memo);
-        }
-
-        memo[index] = ways;
-        return ways;
+        return dp[j] = ans;
     }
 
+public:
     int numDecodings(string s) {
-        vector<int> memo(s.length(), -1);
-        return numDecodingsTopDown(s, 0, memo);
+        unordered_map<int, char> mp;
+        vector<int> dp(s.size(), -1);
+        for (int i = 0; i < 26; i++) {
+            mp[i + 1] = 'a' + i;
+        }
+        return solve(0, dp, s);
     }
 };
