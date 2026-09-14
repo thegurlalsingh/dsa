@@ -1,30 +1,28 @@
 class Solution {
-    vector<vector<int>> memo;
-    bool solve(int i, vector<int>& nums, int sum1, int sum2, int half){
-        if (sum1 > half || sum2 > half){  
-            return false;
-        }
-        if(i == nums.size()){
-            if(sum1 == half && sum2 == half){
+    bool solve(int i, vector<int>& nums, vector<vector<int>>& dp, int curr, int sum){
+        if(i >= nums.size()){
+            if(curr == sum / 2){
                 return true;
             }
             return false;
         }
-        if(memo[i][sum1] != -1){
-            return memo[i][sum1];
+        if(dp[i][curr] != -1){
+            return dp[i][curr];
         }
-        int p1 = solve(i + 1, nums, sum1 + nums[i], sum2, half);
-        int p2 = solve(i + 1, nums, sum1, sum2 + nums[i], half);
-        return memo[i][sum1] = p1 || p2;
+
+        int take = solve(i + 1, nums, dp, curr + nums[i], sum);
+        int skip = solve(i + 1, nums, dp, curr, sum);
+
+        return dp[i][curr] = take || skip;
     }
 public:
     bool canPartition(vector<int>& nums) {
         int sum = accumulate(nums.begin(), nums.end(), 0);
-        if(sum % 2 != 0){
+        int halfSum = sum / 2;
+        if(sum % 2 != 0 || (sum / 2 != halfSum)){
             return false;
         }
-        memo.resize(nums.size(), vector<int>(sum/2 + 1, -1));
-        int half = sum/2;
-        return solve(0, nums, 0, 0, half);
+        vector<vector<int>> dp(nums.size(), vector<int>(sum, -1));
+        return solve(0, nums, dp, 0, sum);
     }
 };
