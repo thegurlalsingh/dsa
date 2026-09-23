@@ -30,7 +30,7 @@ class Solution {
         int nextIndex = bs(i, p);
         int take = p[i][2] + solve(nextIndex, p, dp);
         // if(nextIndex != p.size()){
-            // take = p[i][2] + solve(nextIndex, p, dp);
+            // take = p[i][2] + solve(nextIndex, p, dp); // Removed this because with this we are basically saying: "If there is no next job, I cannot take the current job." Instead we should take up current job without any tension and everything else is handled by base case
         // }
         return dp[i] = max(take, skip);
     }
