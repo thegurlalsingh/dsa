@@ -1,32 +1,26 @@
-class Solution 
-{
-  public:
-    int minPathSumHelper(vector<vector<int>> &grid, vector<vector<int>> &dp, int m, int n, int i, int j) {
-
-        if (i == m - 1 && j == n - 1) {
-            return grid[i][j];
+class Solution {
+    int solve(int i, int j, vector<vector<int>>& triangle, vector<vector<int>>& dp){
+        if(i == triangle.size() - 1 && j == triangle[0].size() - 1){
+            return triangle[triangle.size() - 1][triangle[0].size() - 1];
         }
-        if (i >= m || j >= n) {
-            return INT_MAX;  // invalid path
-        }
-        if (dp[i][j] != -1) {
+        // if(i >= triangle.size() || j >= triangle[0].size()){
+        //     return 0;
+        // }
+        if(dp[i][j] != -1){
             return dp[i][j];
         }
-
-        int down = minPathSumHelper(grid, dp, m, n, i+1, j);
-        int right = minPathSumHelper(grid, dp, m, n, i, j+1);
-
-        int resDown = (down == INT_MAX ? INT_MAX : grid[i][j] + down);
-        int resRight = (right == INT_MAX ? INT_MAX : grid[i][j] + right);
-
-        return dp[i][j] = min(resDown, resRight);
+        int right = INT_MAX; int down = INT_MAX;
+        if(j + 1 < triangle[0].size()){
+            right = triangle[i][j] + solve(i, j + 1, triangle, dp);
+        }
+        if(i + 1 < triangle.size()){
+            down = triangle[i][j] + solve(i + 1, j, triangle, dp);
+        }
+        return dp[i][j] = min(right, down);
     }
-
-    int minPathSum(vector<vector<int>> &grid) {
-        int m = grid.size();
-        int n = grid[0].size();
-        vector<vector<int>> dp(m, vector<int>(n, -1));
-
-        return minPathSumHelper(grid, dp, m, n, 0, 0);
+public:
+    int minPathSum(vector<vector<int>>& grid) {
+        vector<vector<int>> dp(grid.size(), vector<int>(grid[0].size(), -1));
+        return solve(0, 0, grid, dp);
     }
 };
