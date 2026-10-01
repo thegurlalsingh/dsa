@@ -5,7 +5,8 @@ class Solution {
         }
         if(k >= s3.size()){
             return false;
-        }
+        } // this base case instead of i >= s1.size() || j >= s2.size() || k >= s3.size() because there can be a case were i ended but j and k are remaining and they would match so just taking care of k that it should not be outside of boundaries 
+        
         if(dp[i][j][k] != -1){
             return dp[i][j][k];
         }
