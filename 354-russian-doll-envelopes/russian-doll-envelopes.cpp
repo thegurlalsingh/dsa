@@ -1,24 +1,28 @@
 class Solution {
 public:
     int maxEnvelopes(vector<vector<int>>& envelopes) {
-        sort(envelopes.begin(), envelopes.end(), [](auto& a, auto& b) {
-            if (a[0] == b[0])
+        sort(envelopes.begin(), envelopes.end(), [](const vector<int>& a, const vector<int>& b){
+            if (a[0] == b[0]) {
                 return a[1] > b[1];
+            }
+
             return a[0] < b[0];
-        });
-        vector<int> lis;
+        }); // width increasing, height decreasing
 
-        for (auto& e : envelopes) {
-            int h = e[1];
-
-            auto it = lower_bound(lis.begin(), lis.end(), h);
-
-            if (it == lis.end())
-                lis.push_back(h);
-            else
-                *it = h;
+        // for loop version of lis
+        int n=envelopes.size();
+        auto it_ = envelopes.begin();
+        vector<int> tails;
+        for(int i = 0; i < n; i++){
+            int k = envelopes[i][1];
+            if(tails.empty() || tails.back() < k){
+                tails.push_back(k);
+            }
+            else{
+                auto it = lower_bound(tails.begin(), tails.end(), k); // finding first element >= k;
+                *it = k; // then replacing that element with k in tails array -> this will not break lis -> I am keeping the same LIS length but making its ending value as small as possible.
+            }
         }
-
-        return lis.size();
+        return tails.size();
     }
 };
