@@ -1,32 +1,44 @@
 class Solution {
-    int solve(int i, bool deleted, vector<int>& arr, vector<vector<int>>& dp) {
-        if (i == arr.size()) return INT_MIN; // end of array
-        if (dp[i][deleted] != INT_MIN) return dp[i][deleted];
-
-        int take = arr[i]; // start new subarray
-        int extend = INT_MIN;
-
-        int next = solve(i + 1, deleted, arr, dp);
-        if (next != INT_MIN) extend = arr[i] + next; // only add if safe
-
-        int res = max(take, extend);
-
-        // delete current element if not yet deleted
-        if (!deleted) {
-            res = max(res, solve(i + 1, true, arr, dp));
+    int solve(int i , int del , vector<int>& nums , vector<vector<int>>& dp) {
+        if(i == nums.size()) {
+            return 0 ;
         }
 
-        return dp[i][deleted] = res;
-    }
+        if(dp[i][del] != INT_MIN) {
+            return dp[i][del] ;
+        }
 
+        int ans = 0 ;
+        int val = nums[i];
+
+        // Take current element
+        int take = val + solve(i + 1 , del , nums , dp) ;
+        ans = max(ans , take) ;
+
+        // Delete current element
+        if(del == 0) {
+            int skip = solve(i + 1 , 1 , nums , dp) ;
+            ans = max(ans , skip) ;
+        }
+
+        return dp[i][del] = ans ;
+    }
 public:
     int maximumSum(vector<int>& arr) {
-        int n = arr.size();
-        vector<vector<int>> dp(n, vector<int>(2, INT_MIN));
-        int ans = INT_MIN;
-        for (int i = 0; i < n; i++) {
-            ans = max(ans, solve(i, false, arr, dp));
+        int n = arr.size() ;
+
+        vector<vector<int>> dp(n + 1, vector<int>(2 , INT_MIN)) ;
+
+        int ans = INT_MIN ;
+
+        int i = 0 ;
+
+        while(i < n) {
+            int curr = arr[i] + solve(i + 1 , 0 , arr , dp) ;
+            ans = max(ans , curr) ;
+            i++ ;
         }
-        return ans;
+
+        return ans ;
     }
 };
