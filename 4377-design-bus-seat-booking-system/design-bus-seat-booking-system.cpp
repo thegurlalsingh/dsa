@@ -39,7 +39,7 @@ public:
                 totalTime += 1;
                 cost[{r, c}] = 1;
             }
-            minTime++;
+            minTime++; // adding minTime only once because see there are only two possibilites -> if middle seat is empty then ofc window will take 1 but if adjacent is taken -> we can shuffle the order and this window seat will be booked first and then middle seat so again it will take 1 -> so in both possibilites, we have to add 1, so everytime just add 1 while booking and remove 1 will making it free
             seats[r][c] = 1;
         }
 
